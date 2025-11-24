@@ -4,7 +4,8 @@ export const users = sqliteTable('users', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
 	name: text('name').notNull(),
 	email: text('email').notNull().unique(),
-	image: text('image')
+	image: text('image'),
+	description: text('description')
 });
 
 export const watchlists = sqliteTable('watchlists', {
@@ -12,7 +13,9 @@ export const watchlists = sqliteTable('watchlists', {
 	userId: integer('user_id')
 		.notNull()
 		.references(() => users.id),
-	name: text('name').notNull()
+	name: text('name').notNull(),
+	description: text('description'),
+	favourite: integer('favourite').default(0)
 });
 
 export const watchlistItems = sqliteTable('watchlist_items', {

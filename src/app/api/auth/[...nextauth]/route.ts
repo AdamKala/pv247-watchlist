@@ -40,21 +40,39 @@ export const authOptions: AuthOptions = {
 
 			return true;
 		},
-		session: async ({ session, token }) => {
-			if (session.user) {
-				session.user.email = token.email as string;
-				session.user.name = token.name as string;
-				session.user.image = token.picture as string;
+		session: async ({ session }) => {
+			if (!session.user?.email) return session;
+
+			const dbUser = await db
+				.select()
+				.from(users)
+				.where(eq(users.email, session.user.email))
+				.get();
+
+			if (dbUser) {
+				session.user.name = dbUser.name;
+				session.user.image = dbUser.image;
 			}
 			return session;
 		},
 
 		jwt: async ({ token, user }) => {
 			if (user) {
-				token.email = user.email;
-				token.name = user.name;
-				token.picture = user.image;
+				const dbUser = await db
+					.select()
+					.from(users)
+					.where(eq(users.email, user.email!))
+					.get();
+
+				if (!dbUser) {
+					await db.insert(users).values({
+						email: user.email!,
+						name: user.name!,
+						image: user.image!
+					});
+				}
 			}
+
 			return token;
 		}
 	},
