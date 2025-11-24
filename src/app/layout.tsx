@@ -19,7 +19,7 @@ const RootLayout = ({
 	children: React.ReactNode;
 }>) => (
 	<html lang="en">
-		<body className={poppins.className}>
+		<body className={`${poppins.className} bg-gray-700`}>
 			<Providers>
 				<Navigation />
 

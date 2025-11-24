@@ -11,18 +11,20 @@ const LoginPage = () => {
 
 	useEffect(() => {
 		if (session) {
-			router.push('/dashboard');
+			router.push('/account');
 		}
 	}, [session, router]);
 
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4">
-			<div className="w-full max-w-sm rounded-lg bg-white p-8 shadow-md">
-				<h1 className="mb-6 text-center text-2xl font-bold">Sign In</h1>
+		<div className="justify-top flex min-h-screen flex-col items-center p-4">
+			<div className="w-full max-w-sm rounded-xl bg-black p-8 shadow-lg">
+				<h1 className="mb-6 text-center text-2xl font-bold text-white">
+					Sign In
+				</h1>
 
 				<button
-					onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
-					className="flex w-full items-center justify-center gap-2 rounded-md bg-gray-500 px-4 py-2 font-semibold text-white transition hover:bg-gray-600"
+					onClick={() => signIn('google', { callbackUrl: '/account' })}
+					className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
 				>
 					<Image
 						src="/icons/google.svg"
@@ -34,8 +36,8 @@ const LoginPage = () => {
 				</button>
 
 				<button
-					onClick={() => signIn('github', { callbackUrl: '/dashboard' })}
-					className="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-gray-500 px-4 py-2 font-semibold text-white transition hover:bg-gray-600"
+					onClick={() => signIn('github', { callbackUrl: '/account' })}
+					className="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
 				>
 					<Image
 						src="/icons/github.svg"
