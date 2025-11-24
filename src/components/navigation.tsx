@@ -54,7 +54,7 @@ const ClientNavigation = ({ session }: { session: Session | null }) => {
 									href="/account"
 									className={`rounded-lg px-4 py-2 text-lg font-semibold transition ${pathname === '/account' ? 'bg-blue-700 text-white' : 'text-white hover:bg-blue-700 hover:text-white'} `}
 								>
-									My account
+									My profile
 								</Link>
 							</li>
 						)}

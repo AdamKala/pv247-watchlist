@@ -8,6 +8,7 @@ import {
 } from '@/db/watchlists';
 import UserWatchlists from '@/components/account/user-watchlist';
 import ProfileInfo from '@/components/account/profile-info';
+import AddWatchlist from '@/components/account/add-watchlist';
 import { getDescription, updateProfile } from '@/db/account';
 import type { Watchlist } from '@/lib/movies';
 import type { Account } from '@/lib/account';
@@ -53,7 +54,7 @@ const Dashboard = async () => {
 	return (
 		<div className="space-y-6 p-8">
 			<ProfileInfo user={user} updateProfile={editProfile} />
-			<p className="text-2xl font-bold text-white">Your Watchlists</p>
+			<AddWatchlist />
 			<UserWatchlists
 				watchlists={watchlists}
 				favouriteWatchlist={favouriteWatchlist}
