@@ -3,7 +3,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 
-import { Navigation } from '@/components/navigation';
+import { Navigation } from '@/components/navigation-server';
 
 import { Providers } from './providers';
 
@@ -23,7 +23,9 @@ const RootLayout = ({
 			<Providers>
 				<Navigation />
 
-				<main className="container my-8">{children}</main>
+				<main className="container mx-auto my-8 max-h-[calc(100vh-120px)] overflow-auto">
+					{children}
+				</main>
 			</Providers>
 		</body>
 	</html>
