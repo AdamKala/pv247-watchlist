@@ -2,28 +2,32 @@
 
 import { useState } from 'react';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
+import { useRouter } from 'next/navigation';
 
 import type { Watchlist } from '@/lib/movies';
 
 type UserWatchlistsProps = {
 	watchlists: Watchlist[];
 	favouriteWatchlist: (watchlistId: number, isFavourite: boolean) => void;
-	onEdit?: (watchlist: Watchlist) => void;
 	onDelete?: (watchlistId: number) => Promise<void>;
 };
 
 const UserWatchlists = ({
 	watchlists,
 	favouriteWatchlist,
-	onEdit,
 	onDelete
 }: UserWatchlistsProps) => {
 	const [watchlistsState, setWatchlistsState] =
 		useState<Watchlist[]>(watchlists);
+	const [deleteConfirmation, setDeleteConfirmation] = useState<number | null>(
+		null
+	);
 
 	const sortedWatchlists = [...watchlistsState].sort((a, b) =>
 		a.favourite && !b.favourite ? -1 : !a.favourite && b.favourite ? 1 : 0
 	);
+
+	const router = useRouter();
 
 	return (
 		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -71,17 +75,20 @@ const UserWatchlists = ({
 						</div>
 
 						<div className="mt-4 flex gap-2">
-							{onEdit && (
-								<button
-									onClick={() => onEdit(watchlist)}
-									className="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
-								>
-									Edit
-								</button>
-							)}
+							<button
+								onClick={() => router.push(`/movielists/edit/${watchlist.id}`)}
+								className="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+							>
+								Edit
+							</button>
 							{onDelete && (
 								<button
 									onClick={() => {
+										if (deleteConfirmation !== watchlist.id) {
+											setDeleteConfirmation(watchlist.id);
+											setTimeout(() => setDeleteConfirmation(null), 5000);
+											return;
+										}
 										setWatchlistsState(watchlistsState =>
 											watchlistsState.filter(w => w.id !== watchlist.id)
 										);
@@ -89,7 +96,9 @@ const UserWatchlists = ({
 									}}
 									className="flex-1 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
 								>
-									Delete
+									{deleteConfirmation === watchlist.id
+										? 'Are you sure?'
+										: 'Delete'}
 								</button>
 							)}
 						</div>

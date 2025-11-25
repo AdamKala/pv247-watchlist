@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -8,6 +8,8 @@ import Image from 'next/image';
 const LoginPage = () => {
 	const { data: session } = useSession();
 	const router = useRouter();
+	const [signGit, setSignGit] = useState(false);
+	const [signGoogle, setSignGoogle] = useState(false);
 
 	useEffect(() => {
 		if (session) {
@@ -23,7 +25,10 @@ const LoginPage = () => {
 				</h1>
 
 				<button
-					onClick={() => signIn('google', { callbackUrl: '/account' })}
+					onClick={() => {
+						setSignGoogle(true);
+						signIn('google', { callbackUrl: '/account' });
+					}}
 					className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
 				>
 					<Image
@@ -32,11 +37,14 @@ const LoginPage = () => {
 						width={20}
 						height={20}
 					/>
-					Login with Google
+					{signGoogle ? 'Signing in...' : 'Login with Google'}
 				</button>
 
 				<button
-					onClick={() => signIn('github', { callbackUrl: '/account' })}
+					onClick={() => {
+						setSignGit(true);
+						signIn('github', { callbackUrl: '/account' });
+					}}
 					className="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
 				>
 					<Image
@@ -45,7 +53,7 @@ const LoginPage = () => {
 						width={20}
 						height={20}
 					/>
-					Login with GitHub
+					{signGit ? 'Signing in...' : 'Login with GitHub'}
 				</button>
 			</div>
 		</div>
