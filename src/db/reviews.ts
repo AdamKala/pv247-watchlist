@@ -83,7 +83,8 @@ export const createReview = async (
 		userId: user.id,
 		movieId,
 		rating,
-		text
+		text,
+		createdAt: new Date().toISOString(),
 	});
 };
 
