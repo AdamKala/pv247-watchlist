@@ -25,3 +25,23 @@ export const watchlistItems = sqliteTable('watchlist_items', {
 		.references(() => watchlists.id),
 	itemSymbol: text('item_symbol').notNull()
 });
+
+export const reviews = sqliteTable('reviews', {
+	id: integer('id').primaryKey({ autoIncrement: true }),
+
+	userId: integer('user_id')
+		.notNull()
+		.references(() => users.id),
+
+	// TODO: Add after movies are done
+	//   movieId: text('movie_id')
+	//     .notNull()
+	//     .references(() => movies.id),
+
+	movieId: integer('movie_id').notNull(),
+
+	rating: integer('rating').notNull(),
+	text: text('text').notNull(),
+
+	createdAt: text('created_at').default('CURRENT_TIMESTAMP')
+});
