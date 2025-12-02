@@ -1,15 +1,11 @@
-type Movie = {
-	id: number;
-	itemSymbol: string;
-	watchlistName: string | null;
-};
+import {movies, watchlistItems, watchlists} from "@/db/schema";
 
-type Watchlist = {
-	id: number;
-	name: string;
-	description: string | null;
-	movies: number;
-	favourite: number | null;
-};
+export type Movie = typeof movies.$inferSelect;
+export type NewMovie = typeof movies.$inferInsert;
 
-export type { Movie, Watchlist };
+
+export type WatchlistItem = typeof watchlistItems.$inferSelect;  // řádek z DB
+export type NewWatchlistItem = typeof watchlistItems.$inferInsert; // pro insert
+
+export type WatchList = typeof watchlists.$inferSelect;
+export type newWatchList = typeof watchlists.$inferInsert;

@@ -16,7 +16,7 @@ export const getUserMovies = async (userEmail: string) => {
 	const movies = await db
 		.select({
 			id: watchlistItems.id,
-			itemSymbol: watchlistItems.itemSymbol,
+			movieId: watchlistItems.movieId,
 			watchlistName: watchlists.name
 		})
 		.from(watchlistItems)
