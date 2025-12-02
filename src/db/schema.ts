@@ -2,10 +2,10 @@ import {
 	sqliteTable,
 	text,
 	integer,
+    real,
 	primaryKey,
 	uniqueIndex
 } from 'drizzle-orm/sqlite-core';
-import { sql } from 'drizzle-orm';
 
 export const users = sqliteTable('users', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
@@ -14,6 +14,21 @@ export const users = sqliteTable('users', {
 	image: text('image'),
 	description: text('description')
 });
+
+export const movies = sqliteTable('movies', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    title: text('title').notNull(),
+    image: text('image'),
+    description: text('description'),
+    languages: text('languages'),
+    localRating: real('local_rating'),
+    csfdId: text('csf_id'),
+    csfdRating: real('csrf_rating'),
+    csfdLastFetched: text('csrd_last_fetched'),
+    tmdbId: text('imdb_id'),
+    tmdbRating: real('imdb_rating'),
+    tmdbLastFetched: text('imdb_last_fetched'),
+})
 
 export const watchlists = sqliteTable('watchlists', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
@@ -30,7 +45,9 @@ export const watchlistItems = sqliteTable('watchlist_items', {
 	watchlistId: integer('watchlist_id')
 		.notNull()
 		.references(() => watchlists.id),
-	itemSymbol: text('item_symbol').notNull()
+	movieId: integer('movie_id')
+        .notNull()
+        .references(() => movies.id),
 });
 
 export const groups = sqliteTable('groups', {
