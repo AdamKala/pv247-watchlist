@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { sql } from 'drizzle-orm';
 
 export const users = sqliteTable('users', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
@@ -24,4 +25,24 @@ export const watchlistItems = sqliteTable('watchlist_items', {
 		.notNull()
 		.references(() => watchlists.id),
 	itemSymbol: text('item_symbol').notNull()
+});
+
+export const reviews = sqliteTable('reviews', {
+	id: integer('id').primaryKey({ autoIncrement: true }),
+
+	userId: integer('user_id')
+		.notNull()
+		.references(() => users.id),
+
+	// TODO: Add after movies are done
+	//   movieId: text('movie_id')
+	//     .notNull()
+	//     .references(() => movies.id),
+
+	movieId: integer('movie_id').notNull(),
+
+	rating: integer('rating').notNull(),
+	text: text('text').notNull(),
+
+	createdAt: text('created_at').notNull()
 });
