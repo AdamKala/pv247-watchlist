@@ -12,6 +12,7 @@ const ClientNavigation = ({ session }: { session: Session | null }) => {
 	const links = [
 		{ href: '/', label: 'Home' },
 		{ href: '/movielists', label: 'My Movies' },
+		{ href: '/groups', label: 'Groups' },
 		{ href: '/reviews', label: 'My Reviews' },
 		{ href: 'https://www.imdb.com/', label: 'IMDb', external: true },
 		{ href: 'https://www.csfd.cz/', label: 'ČSFD', external: true },
