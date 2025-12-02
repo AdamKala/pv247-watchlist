@@ -37,3 +37,6 @@ next-env.d.ts
 dev.*
 /drizzle
 local.*
+
+.idea
+package-lock.json
