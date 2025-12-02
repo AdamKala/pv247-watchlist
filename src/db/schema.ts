@@ -5,6 +5,7 @@ import {
 	primaryKey,
 	uniqueIndex
 } from 'drizzle-orm/sqlite-core';
+import { sql } from 'drizzle-orm';
 
 export const users = sqliteTable('users', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
@@ -117,4 +118,24 @@ export const groupFavoriteComments = sqliteTable('group_favorite_comments', {
 		.references(() => users.id),
 	comment: text('comment').notNull(),
 	createdAt: integer('created_at').notNull()
+});
+
+export const reviews = sqliteTable('reviews', {
+	id: integer('id').primaryKey({ autoIncrement: true }),
+
+	userId: integer('user_id')
+		.notNull()
+		.references(() => users.id),
+
+	// TODO: Add after movies are done
+	//   movieId: text('movie_id')
+	//     .notNull()
+	//     .references(() => movies.id),
+
+	movieId: integer('movie_id').notNull(),
+
+	rating: integer('rating').notNull(),
+	text: text('text').notNull(),
+
+	createdAt: text('created_at').notNull()
 });
