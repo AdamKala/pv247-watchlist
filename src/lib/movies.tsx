@@ -2,6 +2,14 @@ import {movies, watchlistItems, watchlists} from "@/db/schema";
 
 export type Movie = typeof movies.$inferSelect;
 export type NewMovie = typeof movies.$inferInsert;
+export type MovieSearchItemProps = {
+    title: string;
+    posterUrl: string;
+    id: number;
+    origins: string[];
+    type: string;
+    year: string;
+}
 
 
 export type WatchlistItem = typeof watchlistItems.$inferSelect;  // řádek z DB
