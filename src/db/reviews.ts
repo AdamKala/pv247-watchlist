@@ -1,9 +1,11 @@
-import { eq, and, desc, asc } from 'drizzle-orm';
+import { eq, and, desc, asc, sql } from 'drizzle-orm';
+
 import { reviews, users, movies } from './schema';
+
 import { db } from './index';
 
 export const getReviewsForMovie = async (movieId: number) =>
-	await db
+	db
 		.select({
 			id: reviews.id,
 			rating: reviews.rating,
@@ -11,10 +13,13 @@ export const getReviewsForMovie = async (movieId: number) =>
 			createdAt: reviews.createdAt,
 			userName: users.name,
 			userImage: users.image,
-			movieId: movies.id
+			movieId: reviews.movieId,
+			movieTitle: movies.title,
+			movieYear: movies.year
 		})
 		.from(reviews)
 		.leftJoin(users, eq(reviews.userId, users.id))
+		.leftJoin(movies, eq(reviews.movieId, movies.id))
 		.where(eq(reviews.movieId, movieId));
 
 export const getUserReviews = async (
@@ -61,26 +66,39 @@ export const getUserReviews = async (
 };
 
 export const createReview = async (
-	userEmail: string,
-	movieId: number,
-	rating: number,
-	text: string
+  userEmail: string,
+  movieId: number,
+  rating: number,
+  text: string
 ) => {
-	const user = await db
-		.select()
-		.from(users)
-		.where(eq(users.email, userEmail))
-		.get();
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, userEmail))
+    .get();
 
-	if (!user) throw new Error('User not found.');
+  if (!user) throw new Error('User not found.');
 
-	await db.insert(reviews).values({
-		userId: user.id,
-		movieId,
-		rating,
-		text,
-		createdAt: new Date().toISOString(),
-	});
+  await db.insert(reviews).values({
+    userId: user.id,
+    movieId,
+    rating,
+    text,
+    createdAt: new Date().toISOString(),
+  });
+
+  const avgRow = await db
+    .select({
+      avg: sql<number>`avg(${reviews.rating})`.as('avg'),
+    })
+    .from(reviews)
+    .where(eq(reviews.movieId, movieId))
+    .get();
+
+  await db
+    .update(movies)
+    .set({ localRating: avgRow?.avg ?? null })
+    .where(eq(movies.id, movieId));
 };
 
 export const deleteReview = async (reviewId: number) => {
@@ -113,9 +131,12 @@ export const getLatestReviews = async (userEmail: string, limit = 2) => {
 			rating: reviews.rating,
 			text: reviews.text,
 			createdAt: reviews.createdAt,
-			movieId: reviews.movieId
+			movieId: reviews.movieId,
+			movieTitle: movies.title,
+			movieYear: movies.year
 		})
 		.from(reviews)
+		.leftJoin(movies, eq(reviews.movieId, movies.id))
 		.where(eq(reviews.userId, user.id))
 		.orderBy(desc(reviews.createdAt))
 		.limit(limit);

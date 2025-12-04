@@ -29,8 +29,8 @@ export const movies = sqliteTable('movies', {
 	csfdLastFetched: text('csrd_last_fetched'),
 	tmdbId: integer('imdb_id'),
 	tmdbRating: real('imdb_rating'),
-	tmdbLastFetched: text('imdb_last_fetched'),
-})
+	tmdbLastFetched: text('imdb_last_fetched')
+});
 
 export const watchlists = sqliteTable('watchlists', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
@@ -49,7 +49,7 @@ export const watchlistItems = sqliteTable('watchlist_items', {
 		.references(() => watchlists.id),
 	movieId: integer('movie_id')
 		.notNull()
-		.references(() => movies.id),
+		.references(() => movies.id)
 });
 
 export const groups = sqliteTable('groups', {
