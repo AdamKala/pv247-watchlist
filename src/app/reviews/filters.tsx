@@ -11,9 +11,17 @@ type FiltersProps = {
 
 const Filters = ({ searchParams, movieList }: FiltersProps) => {
 	const updateParam = (key: string, value?: string) => {
-		const params = new URLSearchParams(searchParams as Record<string, string>);
+		const params = new URLSearchParams();
+
+		for (const [k, v] of Object.entries(searchParams)) {
+			if (typeof v === 'string' && v.length > 0) {
+				params.set(k, v);
+			}
+		}
+
 		if (!value) params.delete(key);
 		else params.set(key, value);
+
 		window.location.search = params.toString();
 	};
 
@@ -26,7 +34,7 @@ const Filters = ({ searchParams, movieList }: FiltersProps) => {
 			>
 				<option value="">All movies</option>
 				{movieList.map(m => (
-					<option key={m} value={m}>
+					<option key={m} value={String(m)}>
 						{m}
 					</option>
 				))}
