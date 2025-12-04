@@ -41,7 +41,9 @@ const ReviewsPage = async ({ searchParams }: ReviewsPageProps) => {
 			: undefined;
 
 	const sortBy: SortBy = isSortBy(sp.sortBy) ? sp.sortBy : 'createdAt';
-	const sortOrder: SortOrder = isSortOrder(sp.sortOrder) ? sp.sortOrder : 'desc';
+	const sortOrder: SortOrder = isSortOrder(sp.sortOrder)
+		? sp.sortOrder
+		: 'desc';
 
 	const reviews = await getUserReviews(session.user.email, {
 		movieId: Number.isFinite(movieFilter as number) ? movieFilter : undefined,
@@ -49,7 +51,9 @@ const ReviewsPage = async ({ searchParams }: ReviewsPageProps) => {
 		sortOrder
 	});
 
-	const movieList = [...new Set(reviews.map(r => r.movieId))].sort((a, b) => a - b);
+	const movieList = [...new Set(reviews.map(r => r.movieId))].sort(
+		(a, b) => a - b
+	);
 
 	return (
 		<div className="mx-auto mt-16 max-w-5xl p-4 text-white">

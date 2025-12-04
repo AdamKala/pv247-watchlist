@@ -1,26 +1,30 @@
 import { desc, eq } from 'drizzle-orm';
+
 import { db } from '@/db';
 import { movieVisits, movies, users } from '@/db/schema';
 
-export async function trackMovieVisit(userId: number, movieId: number) {
-  const visitedAt = Math.floor(Date.now() / 1000);
+export const trackMovieVisit = async (userId: number, movieId: number) => {
+	const visitedAt = Math.floor(Date.now() / 1000);
 
-  await db
-    .insert(movieVisits)
-    .values({ userId, movieId, visitedAt })
-    .onConflictDoUpdate({
-      target: [movieVisits.userId, movieVisits.movieId],
-      set: { visitedAt },
-    });
-}
+	await db
+		.insert(movieVisits)
+		.values({ userId, movieId, visitedAt })
+		.onConflictDoUpdate({
+			target: [movieVisits.userId, movieVisits.movieId],
+			set: { visitedAt }
+		});
+};
 
-export async function getRecentlyVisitedMoviesByEmail(email: string, limit = 20) {
-	return db
+export const getRecentlyVisitedMoviesByEmail = async (
+	email: string,
+	limit = 20
+) =>
+	db
 		.select({
 			id: movies.id,
 			title: movies.title,
 			year: movies.year,
-			visitedAt: movieVisits.visitedAt,
+			visitedAt: movieVisits.visitedAt
 		})
 		.from(movieVisits)
 		.innerJoin(users, eq(movieVisits.userId, users.id))
@@ -28,4 +32,3 @@ export async function getRecentlyVisitedMoviesByEmail(email: string, limit = 20)
 		.where(eq(users.email, email))
 		.orderBy(desc(movieVisits.visitedAt))
 		.limit(limit);
-}

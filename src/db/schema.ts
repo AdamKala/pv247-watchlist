@@ -157,20 +157,24 @@ export const reviews = sqliteTable('reviews', {
 	createdAt: integer('created_at').notNull()
 });
 
-export const movieVisits = sqliteTable('movie_visits',
-  {
-    userId: integer('user_id')
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
+export const movieVisits = sqliteTable(
+	'movie_visits',
+	{
+		userId: integer('user_id')
+			.notNull()
+			.references(() => users.id, { onDelete: 'cascade' }),
 
-    movieId: integer('movie_id')
-      .notNull()
-      .references(() => movies.id, { onDelete: 'cascade' }),
+		movieId: integer('movie_id')
+			.notNull()
+			.references(() => movies.id, { onDelete: 'cascade' }),
 
-    visitedAt: integer('visited_at').notNull(),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.userId, t.movieId] }),
-    byUserVisited: index('idx_movie_visits_user_visited').on(t.userId, t.visitedAt),
-  })
+		visitedAt: integer('visited_at').notNull()
+	},
+	t => ({
+		pk: primaryKey({ columns: [t.userId, t.movieId] }),
+		byUserVisited: index('idx_movie_visits_user_visited').on(
+			t.userId,
+			t.visitedAt
+		)
+	})
 );
