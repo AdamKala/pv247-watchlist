@@ -2,7 +2,7 @@ import {
 	sqliteTable,
 	text,
 	integer,
-    real,
+	real,
 	primaryKey,
 	uniqueIndex
 } from 'drizzle-orm/sqlite-core';
@@ -16,21 +16,21 @@ export const users = sqliteTable('users', {
 });
 
 export const movies = sqliteTable('movies', {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    title: text('title').notNull(),
-    year: integer('year'),
-    image: text('image'),
-    description: text('description'),
-    origins: text('origins'),
-    type: text('type'),
-    localRating: real('local_rating'),
-    csfdId: integer('csf_id').notNull().unique(),
-    csfdRating: real('csrf_rating'),
-    csfdLastFetched: text('csrd_last_fetched'),
-    tmdbId: integer('imdb_id'),
-    tmdbRating: real('imdb_rating'),
-    tmdbLastFetched: text('imdb_last_fetched'),
-})
+	id: integer('id').primaryKey({ autoIncrement: true }),
+	title: text('title').notNull(),
+	year: integer('year'),
+	image: text('image'),
+	description: text('description'),
+	origins: text('origins'),
+	type: text('type'),
+	localRating: real('local_rating'),
+	csfdId: integer('csf_id').notNull().unique(),
+	csfdRating: real('csrf_rating'),
+	csfdLastFetched: text('csrd_last_fetched'),
+	tmdbId: integer('imdb_id'),
+	tmdbRating: real('imdb_rating'),
+	tmdbLastFetched: text('imdb_last_fetched')
+});
 
 export const watchlists = sqliteTable('watchlists', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
@@ -48,8 +48,8 @@ export const watchlistItems = sqliteTable('watchlist_items', {
 		.notNull()
 		.references(() => watchlists.id),
 	movieId: integer('movie_id')
-        .notNull()
-        .references(() => movies.id),
+		.notNull()
+		.references(() => movies.id)
 });
 
 export const groups = sqliteTable('groups', {
@@ -146,12 +146,9 @@ export const reviews = sqliteTable('reviews', {
 		.notNull()
 		.references(() => users.id),
 
-	// TODO: Add after movies are done
-	//   movieId: text('movie_id')
-	//     .notNull()
-	//     .references(() => movies.id),
-
-	movieId: integer('movie_id').notNull(),
+	movieId: integer('movie_id')
+		.notNull()
+		.references(() => movies.id),
 
 	rating: integer('rating').notNull(),
 	text: text('text').notNull(),

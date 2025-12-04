@@ -1,25 +1,26 @@
-import { eq, and, desc, asc } from 'drizzle-orm';
+import { eq, and, desc, asc, sql } from 'drizzle-orm';
 
-import { reviews, users } from './schema';
+import { reviews, users, movies } from './schema';
 
-// TODO: Uncomment when movies are ready
-// import { reviews, users, movies } from './schema';
 import { db } from './index';
 
-// export const getReviewsForMovie = async (movieId: number) =>
-export const getReviewsForMovie = async () =>
-	await db
+export const getReviewsForMovie = async (movieId: number) =>
+	db
 		.select({
 			id: reviews.id,
 			rating: reviews.rating,
 			text: reviews.text,
 			createdAt: reviews.createdAt,
 			userName: users.name,
-			userImage: users.image
+			userImage: users.image,
+			movieId: reviews.movieId,
+			movieTitle: movies.title,
+			movieYear: movies.year
 		})
 		.from(reviews)
-		.leftJoin(users, eq(reviews.userId, users.id));
-// .where(eq(reviews.movieId, movieId));
+		.leftJoin(users, eq(reviews.userId, users.id))
+		.leftJoin(movies, eq(reviews.movieId, movies.id))
+		.where(eq(reviews.movieId, movieId));
 
 export const getUserReviews = async (
 	userEmail: string,
@@ -39,7 +40,6 @@ export const getUserReviews = async (
 
 	const filters = [eq(reviews.userId, user.id)];
 
-	// Add movie filter (optional)
 	if (options?.movieId) {
 		filters.push(eq(reviews.movieId, options.movieId));
 	}
@@ -66,26 +66,39 @@ export const getUserReviews = async (
 };
 
 export const createReview = async (
-	userEmail: string,
-	movieId: number,
-	rating: number,
-	text: string
+  userEmail: string,
+  movieId: number,
+  rating: number,
+  text: string
 ) => {
-	const user = await db
-		.select()
-		.from(users)
-		.where(eq(users.email, userEmail))
-		.get();
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, userEmail))
+    .get();
 
-	if (!user) throw new Error('User not found.');
+  if (!user) throw new Error('User not found.');
 
-	await db.insert(reviews).values({
-		userId: user.id,
-		movieId,
-		rating,
-		text,
-		createdAt: new Date().toISOString(),
-	});
+  await db.insert(reviews).values({
+    userId: user.id,
+    movieId,
+    rating,
+    text,
+    createdAt: new Date().toISOString(),
+  });
+
+  const avgRow = await db
+    .select({
+      avg: sql<number>`avg(${reviews.rating})`.as('avg'),
+    })
+    .from(reviews)
+    .where(eq(reviews.movieId, movieId))
+    .get();
+
+  await db
+    .update(movies)
+    .set({ localRating: avgRow?.avg ?? null })
+    .where(eq(movies.id, movieId));
 };
 
 export const deleteReview = async (reviewId: number) => {
@@ -118,9 +131,12 @@ export const getLatestReviews = async (userEmail: string, limit = 2) => {
 			rating: reviews.rating,
 			text: reviews.text,
 			createdAt: reviews.createdAt,
-			movieId: reviews.movieId
+			movieId: reviews.movieId,
+			movieTitle: movies.title,
+			movieYear: movies.year
 		})
 		.from(reviews)
+		.leftJoin(movies, eq(reviews.movieId, movies.id))
 		.where(eq(reviews.userId, user.id))
 		.orderBy(desc(reviews.createdAt))
 		.limit(limit);
