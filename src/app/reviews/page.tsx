@@ -11,7 +11,7 @@ type ReviewsPageProps = {
 		movieId?: string;
 		sortBy?: string;
 		sortOrder?: string;
-	};
+	}>;
 };
 
 const SORT_BY = ['createdAt', 'rating'] as const;
@@ -36,20 +36,20 @@ const ReviewsPage = async ({ searchParams }: ReviewsPageProps) => {
 	}
 
 	const movieFilter =
-		typeof searchParams.movieId === 'string' && searchParams.movieId.length > 0
-			? Number(searchParams.movieId)
+		typeof sp.movieId === 'string' && sp.movieId.length > 0
+			? Number(sp.movieId)
 			: undefined;
 
-	const sortBy: SortBy = isSortBy(searchParams.sortBy) ? searchParams.sortBy : 'createdAt';
-	const sortOrder: SortOrder = isSortOrder(searchParams.sortOrder) ? searchParams.sortOrder : 'desc';
+	const sortBy: SortBy = isSortBy(sp.sortBy) ? sp.sortBy : 'createdAt';
+	const sortOrder: SortOrder = isSortOrder(sp.sortOrder) ? sp.sortOrder : 'desc';
 
 	const reviews = await getUserReviews(session.user.email, {
 		movieId: Number.isFinite(movieFilter as number) ? movieFilter : undefined,
 		sortBy,
-		sortOrder,
+		sortOrder
 	});
 
-	const movieList = [...new Set(reviews.map((r) => r.movieId))].sort((a, b) => a - b);
+	const movieList = [...new Set(reviews.map(r => r.movieId))].sort((a, b) => a - b);
 
 	return (
 		<div className="mx-auto mt-16 max-w-5xl p-4 text-white">
@@ -69,7 +69,7 @@ const ReviewsPage = async ({ searchParams }: ReviewsPageProps) => {
 				searchParams={{
 					movieId: sp.movieId,
 					sortBy,
-					sortOrder,
+					sortOrder
 				}}
 			/>
 
