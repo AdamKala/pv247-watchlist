@@ -1,13 +1,8 @@
 import { eq, and, desc, asc } from 'drizzle-orm';
-
-import { reviews, users } from './schema';
-
-// TODO: Uncomment when movies are ready
-// import { reviews, users, movies } from './schema';
+import { reviews, users, movies } from './schema';
 import { db } from './index';
 
-// export const getReviewsForMovie = async (movieId: number) =>
-export const getReviewsForMovie = async () =>
+export const getReviewsForMovie = async (movieId: number) =>
 	await db
 		.select({
 			id: reviews.id,
@@ -15,11 +10,12 @@ export const getReviewsForMovie = async () =>
 			text: reviews.text,
 			createdAt: reviews.createdAt,
 			userName: users.name,
-			userImage: users.image
+			userImage: users.image,
+			movieId: movies.id
 		})
 		.from(reviews)
-		.leftJoin(users, eq(reviews.userId, users.id));
-// .where(eq(reviews.movieId, movieId));
+		.leftJoin(users, eq(reviews.userId, users.id))
+		.where(eq(reviews.movieId, movieId));
 
 export const getUserReviews = async (
 	userEmail: string,
@@ -39,7 +35,6 @@ export const getUserReviews = async (
 
 	const filters = [eq(reviews.userId, user.id)];
 
-	// Add movie filter (optional)
 	if (options?.movieId) {
 		filters.push(eq(reviews.movieId, options.movieId));
 	}
