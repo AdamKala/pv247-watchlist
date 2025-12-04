@@ -66,39 +66,39 @@ export const getUserReviews = async (
 };
 
 export const createReview = async (
-  userEmail: string,
-  movieId: number,
-  rating: number,
-  text: string
+	userEmail: string,
+	movieId: number,
+	rating: number,
+	text: string
 ) => {
-  const user = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, userEmail))
-    .get();
+	const user = await db
+		.select()
+		.from(users)
+		.where(eq(users.email, userEmail))
+		.get();
 
-  if (!user) throw new Error('User not found.');
+	if (!user) throw new Error('User not found.');
 
-  await db.insert(reviews).values({
-    userId: user.id,
-    movieId,
-    rating,
-    text,
-    createdAt: new Date().toISOString(),
-  });
+	await db.insert(reviews).values({
+		userId: user.id,
+		movieId,
+		rating,
+		text,
+		createdAt: new Date().toISOString()
+	});
 
-  const avgRow = await db
-    .select({
-      avg: sql<number>`avg(${reviews.rating})`.as('avg'),
-    })
-    .from(reviews)
-    .where(eq(reviews.movieId, movieId))
-    .get();
+	const avgRow = await db
+		.select({
+			avg: sql<number>`avg(${reviews.rating})`.as('avg')
+		})
+		.from(reviews)
+		.where(eq(reviews.movieId, movieId))
+		.get();
 
-  await db
-    .update(movies)
-    .set({ localRating: avgRow?.avg ?? null })
-    .where(eq(movies.id, movieId));
+	await db
+		.update(movies)
+		.set({ localRating: avgRow?.avg ?? null })
+		.where(eq(movies.id, movieId));
 };
 
 export const deleteReview = async (reviewId: number) => {
