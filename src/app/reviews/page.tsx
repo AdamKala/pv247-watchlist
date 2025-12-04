@@ -9,10 +9,22 @@ import List from './list';
 type ReviewsPageProps = {
 	searchParams: {
 		movieId?: string;
-		sortBy?: 'createdAt' | 'rating';
-		sortOrder?: 'asc' | 'desc';
+		sortBy?: string;
+		sortOrder?: string;
 	};
 };
+
+const SORT_BY = ['createdAt', 'rating'] as const;
+type SortBy = (typeof SORT_BY)[number];
+
+const SORT_ORDER = ['asc', 'desc'] as const;
+type SortOrder = (typeof SORT_ORDER)[number];
+
+const isSortBy = (v: string | undefined): v is SortBy =>
+	!!v && (SORT_BY as readonly string[]).includes(v);
+
+const isSortOrder = (v: string | undefined): v is SortOrder =>
+	!!v && (SORT_ORDER as readonly string[]).includes(v);
 
 const ReviewsPage = async ({ searchParams }: ReviewsPageProps) => {
 	const session = await getServerSession();
@@ -21,20 +33,21 @@ const ReviewsPage = async ({ searchParams }: ReviewsPageProps) => {
 		return <div className="p-10 text-white">Please log in.</div>;
 	}
 
-	const movieFilter = searchParams.movieId
-		? Number(searchParams.movieId)
-		: undefined;
+	const movieFilter =
+		typeof searchParams.movieId === 'string' && searchParams.movieId.length > 0
+			? Number(searchParams.movieId)
+			: undefined;
 
-	const sortBy = (searchParams.sortBy as 'createdAt' | 'rating') ?? 'createdAt';
-	const sortOrder = (searchParams.sortOrder as 'asc' | 'desc') ?? 'desc';
+	const sortBy: SortBy = isSortBy(searchParams.sortBy) ? searchParams.sortBy : 'createdAt';
+	const sortOrder: SortOrder = isSortOrder(searchParams.sortOrder) ? searchParams.sortOrder : 'desc';
 
 	const reviews = await getUserReviews(session.user.email, {
-		movieId: movieFilter,
+		movieId: Number.isFinite(movieFilter as number) ? movieFilter : undefined,
 		sortBy,
-		sortOrder
+		sortOrder,
 	});
 
-	const movieList = [...new Set(reviews.map(r => r.movieId))];
+	const movieList = [...new Set(reviews.map((r) => r.movieId))].sort((a, b) => a - b);
 
 	return (
 		<div className="mx-auto mt-16 max-w-5xl p-4 text-white">
@@ -54,7 +67,7 @@ const ReviewsPage = async ({ searchParams }: ReviewsPageProps) => {
 				searchParams={{
 					movieId: searchParams.movieId,
 					sortBy,
-					sortOrder
+					sortOrder,
 				}}
 			/>
 

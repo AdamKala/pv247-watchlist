@@ -11,13 +11,13 @@ type Props = {
 };
 
 const CreateReviewPageClient = ({ movies }: Props) => {
-	const [rating, setRating] = useState(3);
+	const [rating, setRating] = useState(50);
 	const [movieId, setMovieId] = useState('');
 	const [text, setText] = useState('');
 
 	const handleAction = async (formData: FormData) => {
 		await createReviewAction(formData);
-		setRating(3);
+		setRating(60);
 		setMovieId('');
 		setText('');
 	};
@@ -45,21 +45,31 @@ const CreateReviewPageClient = ({ movies }: Props) => {
 
 				<input type="hidden" name="rating" value={String(rating)} />
 
-				<div className="flex gap-2" aria-label="Rating">
-					{[1, 2, 3, 4, 5].map(star => (
-						<button
-							key={star}
-							type="button"
-							onClick={() => setRating(star)}
-							className={`cursor-pointer text-3xl ${
-								star <= rating ? 'text-yellow-400' : 'text-gray-500'
-							}`}
-							aria-label={`${star} star${star === 1 ? '' : 's'}`}
-							aria-pressed={star === rating}
-						>
-							★
-						</button>
-					))}
+				<div className="flex flex-col gap-2">
+					<div className="flex items-baseline justify-between">
+						<label htmlFor="rating" className="text-sm font-medium text-gray-200">
+							Rating
+						</label>
+						<span className="text-lg font-semibold text-yellow-400">{rating}%</span>
+					</div>
+
+					<input
+						id="rating"
+						type="range"
+						min={0}
+						max={100}
+						step={1}
+						value={rating}
+						onChange={e => setRating(Number(e.target.value))}
+						className="w-full cursor-pointer accent-yellow-400"
+						aria-label="Rating in percent"
+					/>
+
+					<div className="flex justify-between text-xs text-gray-400">
+						<span>0%</span>
+						<span>50%</span>
+						<span>100%</span>
+					</div>
 				</div>
 
 				<textarea

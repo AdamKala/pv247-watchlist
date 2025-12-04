@@ -24,7 +24,7 @@ export const createReviewAction = async (formData: FormData) => {
 		throw new Error('Invalid movieId');
 	}
 
-	if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+	if (!Number.isInteger(rating) || rating < 1 || rating > 100) {
 		throw new Error('Invalid rating');
 	}
 
