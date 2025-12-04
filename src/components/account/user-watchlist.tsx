@@ -4,10 +4,16 @@ import { useState } from 'react';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { useRouter } from 'next/navigation';
 
-import type { Watchlist } from '@/lib/movies';
+type WatchlistCard = {
+	id: number;
+	name: string;
+	description: string | null;
+	favourite: number | null;
+	movies: number;
+};
 
 type UserWatchlistsProps = {
-	watchlists: Watchlist[];
+	watchlists: WatchlistCard[];
 	favouriteWatchlist: (watchlistId: number, isFavourite: boolean) => void;
 	onDelete?: (watchlistId: number) => Promise<void>;
 };
@@ -18,7 +24,8 @@ const UserWatchlists = ({
 	onDelete
 }: UserWatchlistsProps) => {
 	const [watchlistsState, setWatchlistsState] =
-		useState<Watchlist[]>(watchlists);
+		useState<WatchlistCard[]>(watchlists);
+
 	const [deleteConfirmation, setDeleteConfirmation] = useState<number | null>(
 		null
 	);
@@ -44,8 +51,8 @@ const UserWatchlists = ({
 								<AiFillStar
 									onClick={() => {
 										favouriteWatchlist(watchlist.id, false);
-										setWatchlistsState(watchlistsState =>
-											watchlistsState.map(w =>
+										setWatchlistsState(prev =>
+											prev.map(w =>
 												w.id === watchlist.id ? { ...w, favourite: 0 } : w
 											)
 										);
@@ -55,8 +62,8 @@ const UserWatchlists = ({
 								<AiOutlineStar
 									onClick={() => {
 										favouriteWatchlist(watchlist.id, true);
-										setWatchlistsState(watchlistsState =>
-											watchlistsState.map(w =>
+										setWatchlistsState(prev =>
+											prev.map(w =>
 												w.id === watchlist.id ? { ...w, favourite: 1 } : w
 											)
 										);
@@ -64,14 +71,13 @@ const UserWatchlists = ({
 								/>
 							)}
 						</div>
+
 						<div className="flex flex-col gap-2">
 							<h3 className="text-lg font-bold text-white">{watchlist.name}</h3>
 							<p className="text-sm text-gray-400">
 								{watchlist.description ?? 'No description'}
 							</p>
-							<p className="text-sm text-gray-400">
-								{watchlist.movies ?? 0} movies
-							</p>
+							<p className="text-sm text-gray-400">{watchlist.movies} movies</p>
 						</div>
 
 						<div className="mt-4 flex gap-2">
@@ -81,6 +87,7 @@ const UserWatchlists = ({
 							>
 								Edit
 							</button>
+
 							{onDelete && (
 								<button
 									onClick={() => {
@@ -89,10 +96,11 @@ const UserWatchlists = ({
 											setTimeout(() => setDeleteConfirmation(null), 5000);
 											return;
 										}
-										setWatchlistsState(watchlistsState =>
-											watchlistsState.filter(w => w.id !== watchlist.id)
+
+										setWatchlistsState(prev =>
+											prev.filter(w => w.id !== watchlist.id)
 										);
-										onDelete(watchlist.id);
+										void onDelete(watchlist.id);
 									}}
 									className="flex-1 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
 								>

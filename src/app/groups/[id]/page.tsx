@@ -1,9 +1,9 @@
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { revalidatePath } from 'next/cache';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/auth';
 import {
 	addCommentToFavorite,
 	addFavoriteToGroup,
@@ -152,8 +152,8 @@ const GroupDetailPage = async ({ params }: Props) => {
 		);
 	}
 
-	const resolvedParams = await params;
-	const groupId = Number(resolvedParams.id);
+	const { id } = await params;
+	const groupId = Number(id);
 
 	if (Number.isNaN(groupId)) {
 		return (

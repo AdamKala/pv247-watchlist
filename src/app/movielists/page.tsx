@@ -5,6 +5,7 @@ const MovieListsPage = () => (
 			Here you can manage your movie lists.
 		</p>
 	</main>
+	// Use trackMovieVisit(movieId) in /movies/[id] page (movie detail) so visits are tracked reliably.
 );
 
 export default MovieListsPage;

@@ -4,7 +4,8 @@ import {
 	integer,
 	real,
 	primaryKey,
-	uniqueIndex
+	uniqueIndex,
+	index
 } from 'drizzle-orm/sqlite-core';
 
 export const users = sqliteTable('users', {
@@ -153,5 +154,23 @@ export const reviews = sqliteTable('reviews', {
 	rating: integer('rating').notNull(),
 	text: text('text').notNull(),
 
-	createdAt: text('created_at').notNull()
+	createdAt: integer('created_at').notNull()
 });
+
+export const movieVisits = sqliteTable('movie_visits',
+  {
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+
+    movieId: integer('movie_id')
+      .notNull()
+      .references(() => movies.id, { onDelete: 'cascade' }),
+
+    visitedAt: integer('visited_at').notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.userId, t.movieId] }),
+    byUserVisited: index('idx_movie_visits_user_visited').on(t.userId, t.visitedAt),
+  })
+);

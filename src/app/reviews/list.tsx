@@ -2,7 +2,7 @@ type Review = {
 	id: number;
 	rating: number;
 	text: string;
-	createdAt: string | null;
+	createdAt: number;
 	movieId: number;
 };
 
@@ -24,7 +24,7 @@ const List = ({ reviews }: ListProps) => (
 				>
 					<div className="flex items-center justify-between">
 						<h2 className="text-lg font-semibold">{review.movieId}</h2>
-						<span className="text-yellow-400">{review.rating}/5</span>
+						<span className="text-yellow-400">{review.rating}/100</span>
 					</div>
 
 					<p className="mt-3 text-gray-300">{review.text}</p>
