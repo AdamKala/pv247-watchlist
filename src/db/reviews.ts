@@ -1,6 +1,7 @@
 import { eq, and, desc, asc, sql } from 'drizzle-orm';
 
 import { reviews, users, movies } from './schema';
+
 import { db } from './index';
 
 export const getReviewsForMovie = async (movieId: number) =>
@@ -40,7 +41,10 @@ export const getUserReviews = async (
 
 	const filters = [eq(reviews.userId, user.id)];
 
-	if (typeof options?.movieId === 'number' && Number.isFinite(options.movieId)) {
+	if (
+		typeof options?.movieId === 'number' &&
+		Number.isFinite(options.movieId)
+	) {
 		filters.push(eq(reviews.movieId, options.movieId));
 	}
 
@@ -84,12 +88,12 @@ export const createReview = async (
 		movieId,
 		rating,
 		text,
-		createdAt: Math.floor(Date.now() / 1000),
+		createdAt: Math.floor(Date.now() / 1000)
 	});
 
 	const avgRow = await db
 		.select({
-			avg: sql<number>`avg(${reviews.rating})`.as('avg'),
+			avg: sql<number>`avg(${reviews.rating})`.as('avg')
 		})
 		.from(reviews)
 		.where(eq(reviews.movieId, movieId))
@@ -105,8 +109,15 @@ export const deleteReview = async (reviewId: number) => {
 	await db.delete(reviews).where(eq(reviews.id, reviewId));
 };
 
-export const updateReview = async (reviewId: number, rating: number, text: string) => {
-	await db.update(reviews).set({ rating, text }).where(eq(reviews.id, reviewId));
+export const updateReview = async (
+	reviewId: number,
+	rating: number,
+	text: string
+) => {
+	await db
+		.update(reviews)
+		.set({ rating, text })
+		.where(eq(reviews.id, reviewId));
 };
 
 export const getLatestReviews = async (userEmail: string, limit = 2) => {

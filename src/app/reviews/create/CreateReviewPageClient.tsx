@@ -47,10 +47,15 @@ const CreateReviewPageClient = ({ movies }: Props) => {
 
 				<div className="flex flex-col gap-2">
 					<div className="flex items-baseline justify-between">
-						<label htmlFor="rating" className="text-sm font-medium text-gray-200">
+						<label
+							htmlFor="rating"
+							className="text-sm font-medium text-gray-200"
+						>
 							Rating
 						</label>
-						<span className="text-lg font-semibold text-yellow-400">{rating}%</span>
+						<span className="text-lg font-semibold text-yellow-400">
+							{rating}%
+						</span>
 					</div>
 
 					<input

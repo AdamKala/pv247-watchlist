@@ -8,7 +8,9 @@ import { getRecentlyVisitedMoviesByEmail } from '@/db/movieVisits';
 type LatestReview = Awaited<ReturnType<typeof getLatestReviews>>[number];
 type TopMovie = Awaited<ReturnType<typeof getTopMovies>>[number];
 const topMovies: TopMovie[] = await getTopMovies(3);
-type LastVisited = Awaited<ReturnType<typeof getRecentlyVisitedMoviesByEmail>>[number];
+type LastVisited = Awaited<
+	ReturnType<typeof getRecentlyVisitedMoviesByEmail>
+>[number];
 
 const Home = async () => {
 	const session = await getServerSession(authOptions);
@@ -63,7 +65,10 @@ const Home = async () => {
 								<p className="text-gray-400">No visits yet</p>
 							) : (
 								lastVisited.map(v => (
-									<div key={`${v.id}-${v.visitedAt}`} className="mb-2 text-gray-300">
+									<div
+										key={`${v.id}-${v.visitedAt}`}
+										className="mb-2 text-gray-300"
+									>
 										<div className="font-semibold">
 											{v.title}
 											{v.year ? ` (${v.year})` : ''}
