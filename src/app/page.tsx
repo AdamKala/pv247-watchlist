@@ -1,6 +1,6 @@
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/auth';
 import { getLatestReviews } from '@/db/reviews';
 import { getTopMovies } from '@/db/movies';
 import { getRecentlyVisitedMoviesByEmail } from '@/db/movieVisits';
@@ -88,7 +88,7 @@ const Home = async () => {
 									No rated movies yet
 								</div>
 							) : (
-								topMovies.map((m) => (
+								topMovies.map(m => (
 									<div
 										key={m.id}
 										className="flex items-center justify-between rounded-md bg-gray-600/40 p-4 text-gray-300"

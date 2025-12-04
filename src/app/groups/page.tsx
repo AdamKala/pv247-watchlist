@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/auth';
 import { getGroupsOverview } from '@/db/groups';
 
 const GroupsPage = async () => {

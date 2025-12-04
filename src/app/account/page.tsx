@@ -1,6 +1,6 @@
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/auth';
 import {
 	deleteWatchlist,
 	getUserWatchlists,
@@ -10,7 +10,6 @@ import UserWatchlists from '@/components/account/user-watchlist';
 import ProfileInfo from '@/components/account/profile-info';
 import AddWatchlist from '@/components/account/add-watchlist';
 import { getDescription, updateProfile } from '@/db/account';
-import type { Watchlist } from '@/lib/movies';
 import type { Account } from '@/lib/account';
 
 const editProfile = async (formData: FormData) => {
@@ -49,7 +48,7 @@ const Dashboard = async () => {
 		description: (await getDescription(session.user.email)) ?? ''
 	};
 
-	const watchlists: Watchlist[] = await getUserWatchlists(session.user.email);
+	const watchlists = await getUserWatchlists(session.user.email);
 
 	return (
 		<div className="space-y-6 p-8">

@@ -1,10 +1,8 @@
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { redirect } from 'next/navigation';
 
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/auth';
 import { getGroupDetail, updateGroup } from '@/db/groups';
-
-type Props = { params: { id: string } };
 
 const updateGroupAction = async (groupId: number, formData: FormData) => {
 	'use server';
@@ -28,6 +26,10 @@ const updateGroupAction = async (groupId: number, formData: FormData) => {
 	redirect(`/groups/${groupId}`);
 };
 
+type Props = {
+	params: Promise<{ id: string }>;
+};
+
 const GroupEditPage = async ({ params }: Props) => {
 	const session = await getServerSession(authOptions);
 
@@ -39,7 +41,9 @@ const GroupEditPage = async ({ params }: Props) => {
 		);
 	}
 
-	const groupId = Number(params.id);
+	const { id } = await params;
+	const groupId = Number(id);
+
 	const data = await getGroupDetail(session.user.email, groupId);
 
 	if (!data) {

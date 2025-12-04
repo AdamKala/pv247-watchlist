@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 
 import { getUserReviews } from '@/db/reviews';
 
@@ -7,7 +7,7 @@ import Filters from './filters';
 import List from './list';
 
 type ReviewsPageProps = {
-	searchParams: {
+	searchParams: Promise<{
 		movieId?: string;
 		sortBy?: string;
 		sortOrder?: string;
@@ -27,6 +27,8 @@ const isSortOrder = (v: string | undefined): v is SortOrder =>
 	!!v && (SORT_ORDER as readonly string[]).includes(v);
 
 const ReviewsPage = async ({ searchParams }: ReviewsPageProps) => {
+	const sp = await searchParams;
+
 	const session = await getServerSession();
 
 	if (!session?.user?.email) {
@@ -65,7 +67,7 @@ const ReviewsPage = async ({ searchParams }: ReviewsPageProps) => {
 			<Filters
 				movieList={movieList}
 				searchParams={{
-					movieId: searchParams.movieId,
+					movieId: sp.movieId,
 					sortBy,
 					sortOrder,
 				}}
