@@ -38,6 +38,7 @@ export const getUserWatchlists = async (userEmail: string) => {
 	const watchlistData = await db
 		.select({
 			id: watchlists.id,
+			userId: watchlists.userId,
 			name: watchlists.name,
 			description: watchlists.description,
 			favourite: watchlists.favourite

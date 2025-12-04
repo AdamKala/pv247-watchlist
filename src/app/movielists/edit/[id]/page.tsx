@@ -3,8 +3,8 @@ type Props = {
 };
 
 const EditMovieListPage = async ({ params }: Props) => {
-	const resolvedParams = await params;
-	return <div>Edit Movie List Page {resolvedParams.id}</div>;
+	const { id } = await params;
+	return <div>Edit Movie List Page {id}</div>;
 };
 
 export default EditMovieListPage;

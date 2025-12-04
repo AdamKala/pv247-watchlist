@@ -1,5 +1,5 @@
 import { csfd } from 'node-csfd-api';
-import { eq, asc , desc, sql} from 'drizzle-orm';
+import { eq, asc, desc, sql } from 'drizzle-orm';
 
 import { type Movie, type NewMovie } from '@/lib/movies';
 import { db } from '@/db/index';
@@ -43,17 +43,17 @@ const isWithinLast24Hours = (value: string | null): boolean => {
 };
 
 export const getTopMovies = async (limit = 3) =>
-  db
-    .select({
-      id: movies.id,
-      title: movies.title,
-      year: movies.year,
+	db
+		.select({
+			id: movies.id,
+			title: movies.title,
+			year: movies.year,
 
-      localRating: movies.localRating,
-      csfdRating: movies.csfdRating,
-      tmdbRating: movies.tmdbRating,
+			localRating: movies.localRating,
+			csfdRating: movies.csfdRating,
+			tmdbRating: movies.tmdbRating,
 
-      score: sql<number>`
+			score: sql<number>`
         (
           coalesce(${movies.localRating}, 0) +
           coalesce(${movies.csfdRating}, 0) +
@@ -64,19 +64,15 @@ export const getTopMovies = async (limit = 3) =>
           (case when ${movies.tmdbRating} is null then 0 else 1 end),
           0
         )
-      `.as('score'),
-    })
-    .from(movies)
-    .where(
-      sql`
+      `.as('score')
+		})
+		.from(movies)
+		.where(
+			sql`
         ${movies.localRating} is not null
         or ${movies.csfdRating} is not null
         or ${movies.tmdbRating} is not null
       `
-    )
-    .orderBy(
-      desc(sql`score`),
-      desc(movies.csfdLastFetched),
-      desc(movies.id)
-    )
-    .limit(limit);
+		)
+		.orderBy(desc(sql`score`), desc(movies.csfdLastFetched), desc(movies.id))
+		.limit(limit);

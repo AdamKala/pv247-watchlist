@@ -1,6 +1,6 @@
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/auth';
 import ClientNavigation from '@/components/navigation';
 
 export const Navigation = async () => {
