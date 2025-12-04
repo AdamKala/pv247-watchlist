@@ -1,8 +1,9 @@
 'use server';
 
-import { createReview } from '@/db/reviews';
 import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth';
+
+import { createReview } from '@/db/reviews';
 
 export const createReviewAction = async (formData: FormData) => {
 	const session = await getServerSession();
@@ -11,12 +12,24 @@ export const createReviewAction = async (formData: FormData) => {
 		throw new Error('Unauthorized');
 	}
 
-	const movieId = Number(formData.get('movieId'));
-	const rating = Number(formData.get('rating'));
-	const text = String(formData.get('text'));
+	const movieIdRaw = formData.get('movieId');
+	const ratingRaw = formData.get('rating');
+	const textRaw = formData.get('text');
 
-	if (!movieId || !rating || !text.length) {
-		throw new Error('Invalid form data');
+	const movieId = Number(movieIdRaw);
+	const rating = Number(ratingRaw);
+	const text = typeof textRaw === 'string' ? textRaw.trim() : '';
+
+	if (!Number.isInteger(movieId) || movieId <= 0) {
+		throw new Error('Invalid movieId');
+	}
+
+	if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+		throw new Error('Invalid rating');
+	}
+
+	if (!text.length) {
+		throw new Error('Text is required');
 	}
 
 	await createReview(session.user.email, movieId, rating, text);

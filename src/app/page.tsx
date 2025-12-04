@@ -2,14 +2,11 @@ import { getServerSession } from 'next-auth';
 
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getLatestReviews } from '@/db/reviews';
+import { getTopMovies } from '@/db/movies';
 
-type LatestReview = {
-	id: number;
-	movieId: number;
-	rating: number;
-	text: string;
-	createdAt: string | null;
-};
+type LatestReview = Awaited<ReturnType<typeof getLatestReviews>>[number];
+type TopMovie = Awaited<ReturnType<typeof getTopMovies>>[number];
+const topMovies: TopMovie[] = await getTopMovies(3);
 
 const Home = async () => {
 	const session = await getServerSession(authOptions);
@@ -38,11 +35,14 @@ const Home = async () => {
 								<p className="text-gray-400">No reviews yet</p>
 							)}
 
-							{latestReviews.map((review) => (
+							{latestReviews.map(review => (
 								<div key={review.id} className="mb-2 text-gray-300">
 									<div className="font-semibold">
-										Movie #{review.movieId} — {review.rating}/5
+										{review.movieTitle ?? `Movie #${review.movieId}`}
+										{review.movieYear ? ` (${review.movieYear})` : ''} —{' '}
+										{review.rating}/5
 									</div>
+
 									<div className="text-sm text-gray-500">
 										{review.text.length > 40
 											? `${review.text.slice(0, 40)}...`
@@ -65,14 +65,27 @@ const Home = async () => {
 						<h2 className="mb-4 font-semibold">Top movies</h2>
 
 						<div className="flex flex-col gap-4">
-							{[1, 2, 3].map((i) => (
-								<div
-									key={i}
-									className="flex h-32 items-center justify-center rounded-md bg-gray-600/40 text-gray-300"
-								>
-									Movie #{i} - placeholder
+							{topMovies.length === 0 ? (
+								<div className="flex h-32 items-center justify-center rounded-md bg-gray-600/40 text-gray-300">
+									No rated movies yet
 								</div>
-							))}
+							) : (
+								topMovies.map((m) => (
+									<div
+										key={m.id}
+										className="flex items-center justify-between rounded-md bg-gray-600/40 p-4 text-gray-300"
+									>
+										<div className="font-semibold">
+											{m.title}
+											{m.year ? ` (${m.year})` : ''}
+										</div>
+
+										<div className="text-sm text-gray-200">
+											{Number(m.score).toFixed(1)}
+										</div>
+									</div>
+								))
+							)}
 						</div>
 					</div>
 				</div>
