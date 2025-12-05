@@ -5,13 +5,9 @@ import EditWatchlistPage from '@/components/watchlist/edit-watchlist-page';
 import { getWatchlistItemsAction } from '@/actions/watchlist/get-watchlist-items';
 import { getWatchlistByIdAction } from '@/actions/watchlist/get-watchlist-by-id';
 
-type PageProps = {
-	params: { id: string };
-};
-
-const Page = async (props: PageProps) => {
+const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 	const session = await getServerSession(authOptions);
-	const params = await Promise.resolve(props.params);
+	const watchlistId = (await params).id;
 
 	if (!session?.user?.email) {
 		return (
@@ -21,7 +17,6 @@ const Page = async (props: PageProps) => {
 		);
 	}
 
-	const watchlistId = params.id;
 	const watchlist = await getWatchlistByIdAction(watchlistId);
 	const watchlistItems = await getWatchlistItemsAction(watchlistId);
 

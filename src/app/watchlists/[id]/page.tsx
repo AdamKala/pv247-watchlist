@@ -6,13 +6,12 @@ import { authOptions } from '@/auth';
 import { getWatchlistByIdAction } from '@/actions/watchlist/get-watchlist-by-id';
 import { getWatchlistItemsAction } from '@/actions/watchlist/get-watchlist-items';
 
-type PageProps = {
-	params: { id: string | string[] };
-};
-
-const WatchlistDetailPage = async (props: PageProps) => {
-	const params = await Promise.resolve(props.params);
-	const watchlistId = Array.isArray(params.id) ? params.id[0] : params.id;
+const WatchlistDetailPage = async ({
+	params
+}: {
+	params: Promise<{ id: string }>;
+}) => {
+	const watchlistId = (await params).id;
 
 	if (!watchlistId) {
 		return (
