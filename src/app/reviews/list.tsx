@@ -57,7 +57,7 @@ const List = ({ reviews }: ListProps) => (
 					</div>
 
 					{review.text ? (
-						<p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-white/75">
+						<p className="mt-3 text-sm leading-relaxed whitespace-pre-line text-white/75">
 							{review.text}
 						</p>
 					) : (

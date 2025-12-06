@@ -131,7 +131,7 @@ export const getLatestReviews = async (userEmail: string, limit = 2) => {
 		.get();
 
 	if (!user) return [];
-	
+
 	const createdAtSeconds = sql<number>`
 		case
 			when ${reviews.createdAt} > 1000000000000 then cast(${reviews.createdAt} / 1000 as int)

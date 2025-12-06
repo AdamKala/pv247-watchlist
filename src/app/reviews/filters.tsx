@@ -12,7 +12,11 @@ type FiltersProps = {
 };
 
 const Filters = ({ searchParams, movieList }: FiltersProps) => {
-	const updateParam = (key: string, value?: string, extra?: Record<string, string | undefined>) => {
+	const updateParam = (
+		key: string,
+		value?: string,
+		extra?: Record<string, string | undefined>
+	) => {
 		const params = new URLSearchParams(window.location.search);
 
 		if (!value) params.delete(key);
