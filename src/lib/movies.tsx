@@ -11,6 +11,15 @@ export type MovieSearchItemProps = {
 	year: string;
 };
 
+export type WatchlistCard = {
+	id: number;
+	name: string;
+	description: string | null;
+	favourite: number | null;
+	default: number | null;
+	movies: Movie[];
+};
+
 export type WatchlistItem = typeof watchlistItems.$inferSelect; // řádek z DB
 export type NewWatchlistItem = typeof watchlistItems.$inferInsert; // pro insert
 

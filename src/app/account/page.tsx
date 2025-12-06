@@ -1,34 +1,15 @@
 import { getServerSession } from 'next-auth/next';
 
 import { authOptions } from '@/auth';
-import {
-	deleteWatchlist,
-	getUserWatchlists,
-	toggleFavouriteWatchlist
-} from '@/db/watchlists';
 import UserWatchlists from '@/components/account/user-watchlist';
 import ProfileInfo from '@/components/account/profile-info';
 import AddWatchlist from '@/components/account/add-watchlist';
-import { getDescription, updateProfile } from '@/db/account';
+import { getDescription } from '@/db/account';
 import type { Account } from '@/lib/account';
-
-const editProfile = async (formData: FormData) => {
-	'use server';
-	await updateProfile(formData);
-};
-
-const favouriteWatchlist = async (
-	watchlistId: number,
-	isFavourite: boolean
-) => {
-	'use server';
-	await toggleFavouriteWatchlist(watchlistId, isFavourite);
-};
-
-const deleteUserWatchlist = async (watchlistId: number) => {
-	'use server';
-	await deleteWatchlist(watchlistId);
-};
+import { deleteUserWatchlistAction } from '@/actions/watchlist/delete-watchlist';
+import { favouriteWatchlistAction } from '@/actions/watchlist/favourite-watchlist';
+import { editProfileAction } from '@/actions/profile/edit-profile';
+import { getWatchlistsAction } from '@/actions/watchlist/get-watchlists';
 
 const Dashboard = async () => {
 	const session = await getServerSession(authOptions);
@@ -48,16 +29,16 @@ const Dashboard = async () => {
 		description: (await getDescription(session.user.email)) ?? ''
 	};
 
-	const watchlists = await getUserWatchlists(session.user.email);
+	const watchlists = await getWatchlistsAction();
 
 	return (
 		<div className="space-y-6 p-8">
-			<ProfileInfo user={user} updateProfile={editProfile} />
+			<ProfileInfo user={user} updateProfile={editProfileAction} />
 			<AddWatchlist />
 			<UserWatchlists
-				watchlists={watchlists}
-				favouriteWatchlist={favouriteWatchlist}
-				onDelete={deleteUserWatchlist}
+				watchlists={watchlists ?? []}
+				favouriteWatchlist={favouriteWatchlistAction}
+				onDelete={deleteUserWatchlistAction}
 			/>
 		</div>
 	);

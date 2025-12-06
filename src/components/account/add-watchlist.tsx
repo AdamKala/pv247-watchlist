@@ -10,7 +10,7 @@ const AddWatchlist = () => {
 			<p className="text-2xl font-bold text-white">Your Watchlists</p>
 			<button
 				className="mt-2 rounded-md bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
-				onClick={() => router.push('/movielists/create')}
+				onClick={() => router.push('/watchlists/create')}
 			>
 				Create New Watchlist
 			</button>

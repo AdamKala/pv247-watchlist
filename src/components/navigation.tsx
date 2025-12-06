@@ -11,12 +11,11 @@ const ClientNavigation = ({ session }: { session: Session | null }) => {
 
 	const links = [
 		{ href: '/', label: 'Home' },
-		{ href: '/movielists', label: 'My Movies' },
+		{ href: '/watchlists', label: 'My lists' },
 		{ href: '/groups', label: 'Groups' },
 		{ href: '/reviews', label: 'My Reviews' },
-		{ href: 'https://www.imdb.com/', label: 'IMDb', external: true },
 		{ href: 'https://www.csfd.cz/', label: 'ČSFD', external: true },
-		{ href: '/search', label: 'Search' } //TODO include input field
+		{ href: '/search', label: 'Search' }
 	];
 
 	return (
