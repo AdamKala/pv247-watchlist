@@ -32,7 +32,15 @@ const ReviewsPage = async ({ searchParams }: ReviewsPageProps) => {
 	const session = await getServerSession();
 
 	if (!session?.user?.email) {
-		return <div className="p-10 text-white">Please log in.</div>;
+		return (
+			<main className="relative min-h-screen bg-transparent text-white">
+				<div className="mx-auto max-w-5xl px-6 py-10">
+					<div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+						<p className="text-sm text-white/80">Please log in.</p>
+					</div>
+				</div>
+			</main>
+		);
 	}
 
 	const movieFilter =
@@ -56,29 +64,72 @@ const ReviewsPage = async ({ searchParams }: ReviewsPageProps) => {
 	);
 
 	return (
-		<div className="mx-auto mt-16 max-w-5xl p-4 text-white">
-			<div className="mb-6 flex items-center justify-between">
-				<h1 className="text-3xl font-bold">My Reviews</h1>
+		<main className="relative min-h-screen bg-transparent text-white">
+			<div className="mx-auto max-w-5xl px-6 py-10">
+				<header className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+					<div>
+						<div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
+							<span className="h-2 w-2 rounded-full bg-sky-400/80" />
+							My activity
+						</div>
 
-				<Link
-					href="/reviews/create"
-					className="rounded bg-blue-600 px-4 py-2 hover:bg-blue-700"
-				>
-					Add Review
-				</Link>
+						<h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
+							My Reviews
+						</h1>
+
+						<p className="mt-2 text-sm text-white/60">
+							Filter and sort your reviews. Quick overview, same vibe.
+						</p>
+					</div>
+
+					<div className="flex items-center gap-3">
+						<div className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/70">
+							Total:{' '}
+							<span className="font-semibold text-white">{reviews.length}</span>
+						</div>
+
+						<Link
+							href="/reviews/create"
+							className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:border-white/15 hover:bg-white/15 focus:ring-2 focus:ring-white/20 focus:outline-none"
+						>
+							Add Review
+						</Link>
+					</div>
+				</header>
+				<section className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur transition hover:border-white/15 hover:bg-white/[0.07]">
+					<div className="mb-3 flex items-center justify-between gap-3">
+						<div>
+							<h2 className="text-base font-semibold text-white">Filters</h2>
+							<p className="mt-1 text-xs text-white/60">
+								Narrow down by movie and sorting options.
+							</p>
+						</div>
+					</div>
+
+					<Filters
+						movieList={movieList}
+						searchParams={{
+							movieId: sp.movieId,
+							sortBy,
+							sortOrder
+						}}
+					/>
+				</section>
+				<section className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur transition hover:border-white/15 hover:bg-white/[0.07]">
+					<div className="mb-3 flex items-center justify-between gap-3">
+						<div>
+							<h2 className="text-base font-semibold text-white">Results</h2>
+							<p className="mt-1 text-xs text-white/60">
+								Showing {reviews.length} review{reviews.length === 1 ? '' : 's'}
+								.
+							</p>
+						</div>
+					</div>
+
+					<List reviews={reviews} />
+				</section>
 			</div>
-
-			<Filters
-				movieList={movieList}
-				searchParams={{
-					movieId: sp.movieId,
-					sortBy,
-					sortOrder
-				}}
-			/>
-
-			<List reviews={reviews} />
-		</div>
+		</main>
 	);
 };
 
