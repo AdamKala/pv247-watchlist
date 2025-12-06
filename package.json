@@ -1,6 +1,6 @@
 {
-	"name": "task-08-rsc-forms",
-	"version": "0.1.0",
+	"name": "pv247-watchlist",
+	"version": "1.0.0",
 	"private": true,
 	"scripts": {
 		"dev": "next dev --turbopack",
