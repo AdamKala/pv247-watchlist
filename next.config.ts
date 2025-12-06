@@ -14,12 +14,24 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "lh3.googleusercontent.com", // Google OAuth avatars
+        hostname: "lh3.googleusercontent.com",
       },
       {
         protocol: "https",
-        hostname: "avatars.githubusercontent.com", // GitHub avatars
+        hostname: "avatars.githubusercontent.com",
       },
+      {
+        protocol: "https",
+        hostname: "csfd.cz",
+      },
+      {
+        protocol: "https",
+        hostname: "image.pmgstatic.com",
+      },
+      {
+        protocol: "https",
+        hostname: "image.tmdb.org",
+      }
     ]
   }
 }

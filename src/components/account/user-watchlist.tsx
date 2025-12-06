@@ -3,18 +3,23 @@
 import { useState } from 'react';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 type WatchlistCard = {
 	id: number;
 	name: string;
 	description: string | null;
 	favourite: number | null;
+	default: number | null;
 	movies: number;
 };
 
 type UserWatchlistsProps = {
 	watchlists: WatchlistCard[];
-	favouriteWatchlist: (watchlistId: number, isFavourite: boolean) => void;
+	favouriteWatchlist: (
+		watchlistId: number,
+		isFavourite: boolean
+	) => Promise<void>;
 	onDelete?: (watchlistId: number) => Promise<void>;
 };
 
@@ -73,7 +78,12 @@ const UserWatchlists = ({
 						</div>
 
 						<div className="flex flex-col gap-2">
-							<h3 className="text-lg font-bold text-white">{watchlist.name}</h3>
+							<Link
+								href={`/watchlists/${watchlist.id}`}
+								className="text-lg font-bold text-white hover:underline"
+							>
+								{watchlist.name}
+							</Link>
 							<p className="text-sm text-gray-400">
 								{watchlist.description ?? 'No description'}
 							</p>
@@ -82,13 +92,13 @@ const UserWatchlists = ({
 
 						<div className="mt-4 flex gap-2">
 							<button
-								onClick={() => router.push(`/movielists/edit/${watchlist.id}`)}
+								onClick={() => router.push(`/watchlists/edit/${watchlist.id}`)}
 								className="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
 							>
 								Edit
 							</button>
 
-							{onDelete && (
+							{onDelete && watchlist.default !== 1 && (
 								<button
 									onClick={() => {
 										if (deleteConfirmation !== watchlist.id) {

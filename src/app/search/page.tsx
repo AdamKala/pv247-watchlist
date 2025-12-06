@@ -3,12 +3,24 @@
 import { type Key, useEffect, useState } from 'react';
 
 import MovieSearchItem from '@/components/movies/movie-search-item';
+import { useWatchlistContext } from '@/context/watchlist-context';
+import { getWatchlistsAction } from '@/actions/watchlist/get-watchlists';
 
 const SearchPage = () => {
 	const defaultState = {
 		movies: [],
 		tvSeries: []
 	};
+
+	const { setWatchlists } = useWatchlistContext();
+	useEffect(() => {
+		const fetchWatchlists = async () => {
+			const lists = await getWatchlistsAction();
+			setWatchlists(lists ?? null);
+		};
+
+		fetchWatchlists();
+	}, [setWatchlists]);
 
 	const [input, setInput] = useState('');
 	const [results, setResults] = useState(defaultState);
@@ -29,91 +41,101 @@ const SearchPage = () => {
 				}
 				const data = await res.json();
 				setResults(data.results ?? {});
-				console.log(data.results);
 			} catch (e) {
 				console.error(e);
 			} finally {
 				setIsLoading(false);
 			}
-		}, 2000);
+		}, 600);
 
 		return () => clearTimeout(timeoutId);
 	}, [input]);
 
 	return (
-		<main className="container flex h-full min-h-[400px] flex-col items-center justify-center py-10 text-center">
-			<input
-				value={input}
-				onChange={e => setInput(e.target.value)}
-				name="movieTitle"
-				placeholder="Movie/Show title"
-				className="rounded-md border border-gray-700 bg-gray-50 px-6 py-4 outline-none focus:ring-2 focus:ring-blue-600"
-				required
-			/>
+		<main className="container flex w-full flex-col items-center py-10 text-white">
+			<div className="flex w-full max-w-xl flex-col gap-4">
+				<h1 className="text-center text-4xl font-bold text-white">
+					Search Movies & TV Shows
+				</h1>
+				<p className="text-center text-gray-400">
+					Find content and add it to your watchlist.
+				</p>
 
-			<h1 className="my-6 text-3xl font-bold">Search Movies</h1>
-			<p className="text-lg text-gray-600">
-				Use the search bar above to find movies and add them to your watchlist.
-			</p>
+				<input
+					value={input}
+					onChange={e => setInput(e.target.value)}
+					placeholder="Search for a movie or show..."
+					className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-white ring-0 outline-none focus:ring-2 focus:ring-blue-600"
+				/>
 
-			{isLoading && <p className="mt-4 text-sm text-gray-500">Searching…</p>}
-
-			<div className="container mt-4 max-w-2/4 text-left">
-				{results.movies && (
-					<h2 className="my-4 text-center text-3xl font-bold text-white">
-						Movies
-					</h2>
-				)}
-				{results.movies.map(
-					(
-						item: {
-							origins: string[];
-							title: string;
-							poster: string;
-							id: number;
-							year: string;
-						},
-						idx: Key | null | undefined
-					) => (
-						<MovieSearchItem
-							key={idx}
-							title={item.title}
-							posterUrl={item.poster}
-							id={item.id}
-							origins={item.origins}
-							type="movie"
-							year={item.year}
-						/>
-					)
+				{isLoading && (
+					<p className="text-center text-sm text-gray-400">Searching…</p>
 				)}
 			</div>
-			<div className="container mt-4 max-w-2/4 text-left">
-				{results.tvSeries && (
-					<h2 className="my-4 text-center text-3xl font-bold text-white">
-						TV Series
-					</h2>
+
+			<div className="mt-10 w-full max-w-3xl">
+				{results.movies.length > 0 && (
+					<>
+						<h2 className="my-6 text-center text-3xl font-bold text-white">
+							Movies
+						</h2>
+						<div className="flex flex-col gap-4">
+							{results.movies.map(
+								(
+									item: {
+										origins: string[];
+										title: string;
+										poster: string;
+										id: number;
+										year: string;
+									},
+									idx: Key
+								) => (
+									<MovieSearchItem
+										key={idx}
+										title={item.title}
+										posterUrl={item.poster}
+										id={item.id}
+										origins={item.origins}
+										type="movie"
+										year={item.year}
+									/>
+								)
+							)}
+						</div>
+					</>
 				)}
-				{results.tvSeries.map(
-					(
-						item: {
-							title: string;
-							poster: string;
-							id: number;
-							origins: string[];
-							year: string;
-						},
-						idx: Key | null | undefined
-					) => (
-						<MovieSearchItem
-							key={idx}
-							title={item.title}
-							posterUrl={item.poster}
-							id={item.id}
-							origins={item.origins}
-							type="series"
-							year={item.year}
-						/>
-					)
+
+				{results.tvSeries.length > 0 && (
+					<>
+						<h2 className="my-6 mt-10 text-center text-3xl font-bold text-white">
+							TV Series
+						</h2>
+						<div className="flex flex-col gap-4">
+							{results.tvSeries.map(
+								(
+									item: {
+										origins: string[];
+										title: string;
+										poster: string;
+										id: number;
+										year: string;
+									},
+									idx: Key
+								) => (
+									<MovieSearchItem
+										key={idx}
+										title={item.title}
+										posterUrl={item.poster}
+										id={item.id}
+										origins={item.origins}
+										type="series"
+										year={item.year}
+									/>
+								)
+							)}
+						</div>
+					</>
 				)}
 			</div>
 		</main>

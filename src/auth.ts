@@ -4,7 +4,7 @@ import GitHubProvider from 'next-auth/providers/github';
 import { eq } from 'drizzle-orm';
 
 import { db } from '@/db';
-import { users } from '@/db/schema';
+import { users, watchlists } from '@/db/schema';
 
 export const authOptions: AuthOptions = {
 	providers: [
@@ -33,6 +33,19 @@ export const authOptions: AuthOptions = {
 					name: user.name ?? user.email,
 					email: user.email,
 					image: user.image ?? null
+				});
+
+				const newUser = await db
+					.select()
+					.from(users)
+					.where(eq(users.email, user.email))
+					.get();
+
+				await db.insert(watchlists).values({
+					userId: newUser!.id,
+					name: 'Favourites',
+					description: 'Favourite movies and shows',
+					default: 1
 				});
 			}
 

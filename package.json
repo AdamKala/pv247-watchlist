@@ -1,6 +1,6 @@
 {
-	"name": "task-08-rsc-forms",
-	"version": "0.1.0",
+	"name": "pv247-watchlist",
+	"version": "1.0.0",
 	"private": true,
 	"scripts": {
 		"dev": "next dev --turbopack",
@@ -16,12 +16,12 @@
 		"clsx": "^2.1.1",
 		"dotenv": "^17.2.3",
 		"drizzle-orm": "^0.44.7",
-		"next": "15.5.3",
+		"next": "^15.5.7",
 		"next-auth": "^4.24.13",
 		"node-csfd-api": "^4.0.0",
 		"react": "19.1.1",
 		"react-dom": "19.1.1",
-		"react-hook-form": "^7.53.1",
+		"react-hook-form": "^7.68.0",
 		"react-icons": "^5.5.0",
 		"turso": "^0.1.0",
 		"uuid": "^9.0.1",

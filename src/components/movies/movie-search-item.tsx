@@ -1,63 +1,79 @@
-import { type JSX } from 'react';
+'use client';
 
-import { type MovieSearchItemProps } from '@/lib/movies';
+import { useState } from 'react';
+import Image from 'next/image';
 
-const MovieSearchItem: (movieData: MovieSearchItemProps) => JSX.Element = (
-	movieData: MovieSearchItemProps
-) => {
-	const handleAddToDb = async () => {
-		try {
-			const res = await fetch('/search/csfd', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					title: movieData.title,
-					image: movieData.posterUrl,
-					csfdId: movieData.id,
-					year: movieData.year,
-					type: movieData.type,
-					origins: movieData.origins
-				})
-			});
+import ModalMovie from '@/components/ui/modal-movie';
+import WatchlistSelect from '@/components/watchlist/watchlist-select';
+import type { MovieSearchItemProps } from '@/lib/movies';
+import { useWatchlistContext } from '@/context/watchlist-context';
+import { addToWatchlistAction } from '@/actions/watchlist/add-to-watchlist';
 
-			if (!res.ok) {
-				console.error(
-					'Failed to save movie',
-					await res.json().catch(() => ({}))
-				);
-				return;
-			}
-			console.log('Saved to local DB:', movieData);
-		} catch (e) {
-			console.error(e);
-		}
+const MovieSearchItem = (movieData: MovieSearchItemProps) => {
+	const [open, setOpen] = useState(false);
+	const [selectedWatchlist, setSelectedWatchlist] = useState<string>('');
+	const { watchlists } = useWatchlistContext();
+
+	const handleAddToWatchlist = async (watchlistId: string) => {
+		if (!watchlistId) return;
+
+		await addToWatchlistAction(parseInt(watchlistId, 10), movieData);
+
+		setOpen(false);
 	};
 
 	return (
-		<div className="my-2 grid grid-cols-4">
-			<img
-				className="h-[100px] w-[100px] object-contain"
-				src={movieData.posterUrl}
-				alt={`movie-poster-${movieData.title}`}
-			/>
-			<div className="col-span-2">
-				<h2 className="text-xl font-bold text-gray-50">{movieData.title}</h2>
-				<div className="text-gray-200">{movieData.year}</div>
-				<div className="text-gray-400">
-					{movieData.origins.map(origin => (
-						<span key={origin}>{origin}</span>
-					))}
+		<>
+			<div className="flex w-full items-center gap-4 rounded-xl border border-gray-800 bg-gray-900 px-4 py-3 shadow-sm">
+				<Image
+					width={80}
+					height={96}
+					className="h-24 w-20 rounded-md border border-gray-700 object-cover"
+					src={movieData.posterUrl}
+					alt={`poster-${movieData.title}`}
+				/>
+
+				<div className="flex flex-1 flex-col">
+					<h2 className="text-xl font-semibold text-white">
+						{movieData.title}
+					</h2>
+					<div className="text-sm text-gray-300">{movieData.year}</div>
+
+					<div className="mt-1 flex flex-wrap gap-1 text-sm text-gray-400">
+						{movieData.origins.map(origin => (
+							<span
+								key={origin}
+								className="rounded-md bg-gray-800 px-2 py-0.5 text-xs text-gray-300"
+							>
+								{origin}
+							</span>
+						))}
+					</div>
 				</div>
+
+				{watchlists && (
+					<button
+						className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700"
+						onClick={() => setOpen(true)}
+					>
+						Add
+					</button>
+				)}
 			</div>
-			<div>
-				<button
-					className="btn mr-2 cursor-pointer rounded-2xl bg-green-800 px-4 py-1 font-bold text-gray-300 hover:bg-green-950"
-					onClick={() => handleAddToDb()}
-				>
-					Přidat
-				</button>
-			</div>
-		</div>
+
+			<ModalMovie
+				open={open}
+				onClose={() => setOpen(false)}
+				onSubmit={() => handleAddToWatchlist(selectedWatchlist)}
+				title="Add to watchlist"
+				movie={{ title: movieData.title, posterUrl: movieData.posterUrl }}
+			>
+				<WatchlistSelect
+					watchlists={watchlists!}
+					onSelect={setSelectedWatchlist}
+				/>
+			</ModalMovie>
+		</>
 	);
 };
 
