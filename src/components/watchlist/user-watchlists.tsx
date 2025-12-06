@@ -39,7 +39,7 @@ const UserWatchlistsPage = ({
 				<h1 className="text-3xl font-bold">Your Watchlists</h1>
 				<button
 					onClick={() => router.push('/watchlists/create')}
-					className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
+					className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
 				>
 					Create Watchlist
 				</button>
@@ -140,7 +140,7 @@ const UserWatchlistsPage = ({
 									onClick={() =>
 										router.push(`/watchlists/edit/${watchlist.id}`)
 									}
-									className="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+									className="flex-1 cursor-pointer rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
 								>
 									Edit
 								</button>
@@ -159,7 +159,7 @@ const UserWatchlistsPage = ({
 											);
 											void deleteWatchlist(watchlist.id);
 										}}
-										className="flex-1 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+										className="flex-1 cursor-pointer rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
 									>
 										{deleteConfirmation === watchlist.id
 											? 'Are you sure?'

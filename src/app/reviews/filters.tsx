@@ -1,5 +1,7 @@
 'use client';
 
+import Select from '@/components/ui/Select';
+
 type FiltersProps = {
 	searchParams: {
 		movieId?: string;
@@ -26,37 +28,37 @@ const Filters = ({ searchParams, movieList }: FiltersProps) => {
 	};
 
 	return (
-		<div className="mb-8 flex gap-4">
-			<select
-				className="rounded bg-gray-800 px-3 py-2 text-white"
-				onChange={e => updateParam('movieId', e.target.value || undefined)}
+		<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+			<Select
+				label="Movie"
 				value={searchParams.movieId ?? ''}
+				onChange={v => updateParam('movieId', v || undefined)}
 			>
 				<option value="">All movies</option>
 				{movieList.map(m => (
 					<option key={m} value={String(m)}>
-						{m}
+						Movie #{m}
 					</option>
 				))}
-			</select>
+			</Select>
 
-			<select
-				className="rounded bg-gray-800 px-3 py-2 text-white"
-				onChange={e => updateParam('sortBy', e.target.value)}
+			<Select
+				label="Sort by"
 				value={searchParams.sortBy ?? 'createdAt'}
+				onChange={v => updateParam('sortBy', v)}
 			>
 				<option value="createdAt">Newest first</option>
 				<option value="rating">Rating</option>
-			</select>
+			</Select>
 
-			<select
-				className="rounded bg-gray-800 px-3 py-2 text-white"
-				onChange={e => updateParam('sortOrder', e.target.value)}
+			<Select
+				label="Order"
 				value={searchParams.sortOrder ?? 'desc'}
+				onChange={v => updateParam('sortOrder', v)}
 			>
 				<option value="desc">Desc</option>
 				<option value="asc">Asc</option>
-			</select>
+			</Select>
 		</div>
 	);
 };

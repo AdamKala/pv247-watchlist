@@ -110,7 +110,7 @@ const WatchlistForm = ({ initialData, onSubmit }: WatchlistFormProps) => {
 				<div className="mt-4 flex gap-4">
 					<button
 						type="submit"
-						className="rounded-lg bg-blue-600 px-4 py-2 font-semibold transition hover:bg-blue-700"
+						className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold transition hover:bg-blue-700"
 					>
 						{isSubmitting
 							? 'Saving...'
@@ -121,7 +121,7 @@ const WatchlistForm = ({ initialData, onSubmit }: WatchlistFormProps) => {
 					<button
 						type="button"
 						onClick={() => router.back()}
-						className="rounded-lg bg-gray-700 px-4 py-2 font-semibold transition hover:bg-gray-600"
+						className="cursor-pointer rounded-lg bg-gray-700 px-4 py-2 font-semibold transition hover:bg-gray-600"
 					>
 						Cancel
 					</button>
