@@ -36,11 +36,6 @@ const HomePage = ({
 	lastVisited
 }: HomePageProps) => (
 	<main className="relative min-h-screen bg-transparent text-white">
-		<div className="pointer-events-none absolute inset-0 -z-10">
-			<div className="absolute inset-0 bg-[radial-gradient(800px_circle_at_20%_10%,rgba(59,130,246,0.16),transparent_55%),radial-gradient(700px_circle_at_80%_20%,rgba(16,185,129,0.12),transparent_55%),radial-gradient(900px_circle_at_50%_90%,rgba(168,85,247,0.10),transparent_60%)]" />
-			<div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.03),transparent_35%,rgba(255,255,255,0.02))]" />
-		</div>
-
 		<div className="mx-auto max-w-7xl px-6 py-10">
 			<header className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
 				<div>
