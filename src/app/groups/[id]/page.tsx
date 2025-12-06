@@ -205,7 +205,7 @@ const GroupDetailPage = async ({ params }: Props) => {
 								</Link>
 
 								<form action={deleteGroupAction.bind(null, groupId)}>
-									<button className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold hover:bg-red-700">
+									<button className="cursor-pointer rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold hover:bg-red-700">
 										Delete group
 									</button>
 								</form>
@@ -378,7 +378,7 @@ const GroupDetailPage = async ({ params }: Props) => {
 								rows={3}
 							/>
 							<div className="md:col-span-2">
-								<button className="rounded-lg bg-blue-600 px-4 py-2 font-semibold hover:bg-blue-700">
+								<button className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold hover:bg-blue-700">
 									Add
 								</button>
 							</div>
