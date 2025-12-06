@@ -23,7 +23,7 @@ const List = ({ reviews }: ListProps) => (
 	<div className="flex flex-col gap-4">
 		{reviews.map(review => {
 			const date = review.createdAt
-				? new Date(review.createdAt).toLocaleDateString('cs-CZ', {
+				? new Date(review.createdAt * 1000).toLocaleDateString('cs-CZ', {
 						day: '2-digit',
 						month: '2-digit',
 						year: 'numeric'
@@ -52,7 +52,7 @@ const List = ({ reviews }: ListProps) => (
 					</div>
 
 					{review.text ? (
-						<p className="mt-3 text-sm leading-relaxed whitespace-pre-line text-white/75">
+						<p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-white/75">
 							{review.text}
 						</p>
 					) : (
