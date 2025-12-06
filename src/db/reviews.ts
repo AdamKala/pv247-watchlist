@@ -62,9 +62,12 @@ export const getUserReviews = async (
 			rating: reviews.rating,
 			text: reviews.text,
 			createdAt: reviews.createdAt,
-			movieId: reviews.movieId
+			movieId: reviews.movieId,
+			movieTitle: movies.title,
+			movieYear: movies.year
 		})
 		.from(reviews)
+		.leftJoin(movies, eq(reviews.movieId, movies.id))
 		.where(whereClause)
 		.orderBy(order);
 };
@@ -128,6 +131,13 @@ export const getLatestReviews = async (userEmail: string, limit = 2) => {
 		.get();
 
 	if (!user) return [];
+	
+	const createdAtSeconds = sql<number>`
+		case
+			when ${reviews.createdAt} > 1000000000000 then cast(${reviews.createdAt} / 1000 as int)
+			else ${reviews.createdAt}
+		end
+	`;
 
 	return db
 		.select({
@@ -142,6 +152,6 @@ export const getLatestReviews = async (userEmail: string, limit = 2) => {
 		.from(reviews)
 		.leftJoin(movies, eq(reviews.movieId, movies.id))
 		.where(eq(reviews.userId, user.id))
-		.orderBy(desc(reviews.createdAt))
+		.orderBy(desc(createdAtSeconds), desc(reviews.id))
 		.limit(limit);
 };

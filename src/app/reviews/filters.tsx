@@ -12,19 +12,21 @@ type FiltersProps = {
 };
 
 const Filters = ({ searchParams, movieList }: FiltersProps) => {
-	const updateParam = (key: string, value?: string) => {
-		const params = new URLSearchParams();
-
-		for (const [k, v] of Object.entries(searchParams)) {
-			if (typeof v === 'string' && v.length > 0) {
-				params.set(k, v);
-			}
-		}
+	const updateParam = (key: string, value?: string, extra?: Record<string, string | undefined>) => {
+		const params = new URLSearchParams(window.location.search);
 
 		if (!value) params.delete(key);
 		else params.set(key, value);
 
-		window.location.search = params.toString();
+		if (extra) {
+			for (const [k, v] of Object.entries(extra)) {
+				if (!v) params.delete(k);
+				else params.set(k, v);
+			}
+		}
+
+		const qs = params.toString();
+		window.location.search = qs;
 	};
 
 	return (
@@ -45,7 +47,11 @@ const Filters = ({ searchParams, movieList }: FiltersProps) => {
 			<Select
 				label="Sort by"
 				value={searchParams.sortBy ?? 'createdAt'}
-				onChange={v => updateParam('sortBy', v)}
+				onChange={v =>
+					updateParam('sortBy', v, {
+						sortOrder: 'desc'
+					})
+				}
 			>
 				<option value="createdAt">Newest first</option>
 				<option value="rating">Rating</option>

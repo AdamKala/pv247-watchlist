@@ -4,8 +4,10 @@ type Review = {
 	id: number;
 	rating: number;
 	text: string;
-	createdAt: number;
+	createdAt: number; // unix seconds
 	movieId: number;
+	movieTitle: string | null;
+	movieYear: number | null;
 };
 
 type ListProps = {
@@ -38,7 +40,10 @@ const List = ({ reviews }: ListProps) => (
 					<div className="flex items-start justify-between gap-4">
 						<div className="min-w-0">
 							<h2 className="truncate text-sm font-semibold text-white">
-								Movie #{review.movieId}
+								{review.movieTitle ?? `Movie #${review.movieId}`}
+								{review.movieYear ? (
+									<span className="text-white/55"> ({review.movieYear})</span>
+								) : null}
 							</h2>
 							<p className="mt-1 text-xs text-white/60">{date}</p>
 						</div>
@@ -52,7 +57,7 @@ const List = ({ reviews }: ListProps) => (
 					</div>
 
 					{review.text ? (
-						<p className="mt-3 text-sm leading-relaxed whitespace-pre-line text-white/75">
+						<p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-white/75">
 							{review.text}
 						</p>
 					) : (
