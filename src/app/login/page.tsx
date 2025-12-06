@@ -5,17 +5,24 @@ import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
+import { useWatchlistContext } from '@/context/watchlist-context';
+import { getWatchlistsAction } from '@/actions/watchlist/get-watchlists';
+
 const LoginPage = () => {
 	const { data: session } = useSession();
 	const router = useRouter();
 	const [signGit, setSignGit] = useState(false);
 	const [signGoogle, setSignGoogle] = useState(false);
+	const { setWatchlists } = useWatchlistContext();
 
 	useEffect(() => {
 		if (session) {
-			router.push('/account');
+			(async () => {
+				setWatchlists((await getWatchlistsAction()) ?? null);
+				router.push('/account');
+			})();
 		}
-	}, [session, router]);
+	}, [session, router, setWatchlists]);
 
 	return (
 		<div className="justify-top flex min-h-screen flex-col items-center p-4">

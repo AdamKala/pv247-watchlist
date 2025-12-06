@@ -40,6 +40,7 @@ export const watchlists = sqliteTable('watchlists', {
 		.references(() => users.id),
 	name: text('name').notNull(),
 	description: text('description'),
+	default: integer('default').default(0),
 	favourite: integer('favourite').default(0)
 });
 
