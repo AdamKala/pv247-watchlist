@@ -6,6 +6,7 @@ export type MovieSearchItemProps = {
 	title: string;
 	posterUrl: string;
 	id: number;
+    csfdId: number;
 	origins: string[];
 	type: string;
 	year: string;
