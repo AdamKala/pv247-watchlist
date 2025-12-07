@@ -5,11 +5,11 @@ import {pullAndStoreFromCSFDId} from "@/actions/movies/pull-from-csfd";
 import MovieCard from "@/components/movies/movie-card";
 
 type PageProps = {
-    searchParams: {
+    searchParams: Promise<{
         id?: number;
         csfdId?: number;
         type?: string;
-    };
+    }>;
 };
 
 const MovieDetail = async ({ id, type }: { id: number, type: string | null }) => {
@@ -35,7 +35,7 @@ const MovieDetail = async ({ id, type }: { id: number, type: string | null }) =>
 
 export default async function MovieDetailWrapper({ searchParams }: PageProps) {
 
-    const { csfdId, id, type } = searchParams;
+    const { csfdId, id, type } = await searchParams;
 
     const hasCsfd = !!csfdId;
     const hasId = !!id;
