@@ -23,6 +23,7 @@ export const pullAndStoreFromCSFDId = async (
         csfdId,
         csfdLastFetched: new Date().toISOString(),
         csfdRating: rating,
+        primarySource: "csfd",
         type
     };
 

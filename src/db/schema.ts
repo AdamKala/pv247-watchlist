@@ -27,6 +27,7 @@ export const movies = sqliteTable('movies', {
     duration: text('duration'),
 	type: text('type').notNull(),
 	localRating: real('local_rating'),
+    primarySource: text('primary_source').notNull(),
 	csfdId: integer('csf_id').notNull().unique(),
 	csfdRating: real('csrf_rating'),
 	csfdLastFetched: text('csrd_last_fetched'),
