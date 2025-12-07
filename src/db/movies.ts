@@ -11,8 +11,10 @@ export const getAllMovies = async () =>
 		.from(movies)
 		.orderBy(asc(movies.title));
 
-export const addMovieToLocalDB = async (movie: NewMovie) =>
-	db.insert(movies).values(movie);
+export const addMovieToLocalDB = async (movie: NewMovie): Promise<Movie> => {
+    const [inserted] = await db.insert(movies).values(movie).returning();
+    return inserted;
+};
 
 export const autoUpdateMovieRatings = async (movie: Movie) => {
 	if (!isWithinLast24Hours(movie.csfdLastFetched)) {
@@ -76,3 +78,12 @@ export const getTopMovies = async (limit = 3) =>
 		)
 		.orderBy(desc(sql`score`), desc(movies.csfdLastFetched), desc(movies.id))
 		.limit(limit);
+
+export const getMovieById = async (id: number): Promise<Movie | undefined> =>
+    db.query.movies.findFirst({where: eq(movies.id, id)});
+
+export const getMovieByCSFDId = async (csfdId: number) : Promise<Movie | undefined> =>
+    db.query.movies.findFirst({where: eq(movies.csfdId, csfdId)});
+
+export const getMovieByTitle = async (title: string): Promise<Movie | undefined> =>
+    db.query.movies.findFirst({where: eq(movies.title, title)});
