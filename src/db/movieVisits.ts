@@ -1,16 +1,17 @@
+'use server'
 import {and, desc, eq} from 'drizzle-orm';
 
 import { db } from '@/db';
 import { movieVisits, movies, users } from '@/db/schema';
 
-export const trackMovieVisit = async (userId: number, movieId: number) => {
+export const trackMovieVisit = async (userEmail: string, movieId: number) => {
 	const visitedAt = Math.floor(Date.now() / 1000);
 
 	await db
 		.insert(movieVisits)
-		.values({ userId, movieId, visitedAt })
+		.values({ userEmail, movieId, visitedAt })
 		.onConflictDoUpdate({
-			target: [movieVisits.userId, movieVisits.movieId],
+			target: [movieVisits.userEmail, movieVisits.movieId],
 			set: { visitedAt }
 		});
 };
@@ -27,7 +28,7 @@ export const getRecentlyVisitedMoviesByEmail = async (
 			visitedAt: movieVisits.visitedAt
 		})
 		.from(movieVisits)
-		.innerJoin(users, eq(movieVisits.userId, users.id))
+		.innerJoin(users, eq(movieVisits.userEmail, users.id))
 		.innerJoin(movies, eq(movieVisits.movieId, movies.id))
 		.where(eq(users.email, email))
 		.orderBy(desc(movieVisits.visitedAt))
@@ -40,33 +41,37 @@ export const isMovieWatchedBy = async (userEmail: string, movieId: number) => {
             movieSeenAt: movieVisits.movieSeenAt,
         })
         .from(movieVisits)
-        .innerJoin(users, eq(movieVisits.userId, users.id))
-        .where(eq(users.email, userEmail))
-        .limit(1)
+        .where(
+            and(
+                eq(movieVisits.userEmail, userEmail),
+                eq(movieVisits.movieId, movieId)
+            )
+        )
+        .limit(1);
 
     return data[0]
 }
 
-export const setMovieWatchedAt = async (userEmail: string, movieId: number, date: number) : Promise<void> => {
-
-    const userId = db.select({id: users.id}).from(users).where(eq(users.email, userEmail));
-
-    if (!userId) throw new Error(`User ${userId} not found`);
-
-    db
+export const setMovieWatchedAt = async (userEmail: string, movieId: number, date: number) => {
+    await db
         .update(movieVisits)
         .set({ movieSeenAt: date })
         .where(
             and(
                 eq(movieVisits.movieId, movieId),
-                eq(movieVisits.userId, userId)
-            ));
+                eq(movieVisits.userEmail, userEmail)
+            )
+        );
 }
 
 export const resetMovieWatchedAt = async (userEmail: string, movieId: number) : Promise<void> => {
-    const userId = db.select({id: users.id}).from(users).where(eq(users.email, userEmail));
-
-    if (!userId) throw new Error(`User ${userId} not found`);
-
-    db.update(movieVisits).set({ movieSeenAt: null }).where(and(eq(movieVisits.movieId, movieId), eq(movieVisits.userId, userId)));
+    await db
+        .update(movieVisits)
+        .set({ movieSeenAt: null })
+        .where(
+            and(
+                eq(movieVisits.movieId, movieId),
+                eq(movieVisits.userEmail, userEmail)
+            )
+        );
 }

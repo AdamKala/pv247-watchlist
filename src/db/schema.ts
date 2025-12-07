@@ -163,9 +163,9 @@ export const reviews = sqliteTable('reviews', {
 export const movieVisits = sqliteTable(
 	'movie_visits',
 	{
-		userId: integer('user_id')
+		userEmail: text('user_email')
 			.notNull()
-			.references(() => users.id, { onDelete: 'cascade' }),
+			.references(() => users.email, { onDelete: 'cascade' }),
 
 		movieId: integer('movie_id')
 			.notNull()
@@ -175,9 +175,9 @@ export const movieVisits = sqliteTable(
         movieSeenAt: integer('movie_seen_at'),
 	},
 	t => ({
-		pk: primaryKey({ columns: [t.userId, t.movieId] }),
+		pk: primaryKey({ columns: [t.userEmail, t.movieId] }),
 		byUserVisited: index('idx_movie_visits_user_visited').on(
-			t.userId,
+			t.userEmail,
 			t.visitedAt,
 		)
 	})
