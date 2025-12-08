@@ -98,7 +98,7 @@ const SearchPage = () => {
 										posterUrl={item.poster}
 										id={item.id}
 										origins={item.origins}
-                                        csfdId={item.csfdId}
+                                        csfdId={item.id}
 										type="movie"
 										year={item.year}
 									/>
@@ -131,7 +131,7 @@ const SearchPage = () => {
 										title={item.title}
 										posterUrl={item.poster}
 										id={item.id}
-                                        csfdId={item.csfdId}
+                                        csfdId={item.id}
 										origins={item.origins}
 										type="series"
 										year={item.year}
