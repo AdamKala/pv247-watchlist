@@ -1,13 +1,13 @@
 import { eq, and } from 'drizzle-orm';
 import { csfd } from 'node-csfd-api';
 
-import type {Movie, MovieSearchItemProps, NewMovie} from '@/lib/movies';
+import type { Movie, MovieSearchItemProps, NewMovie } from '@/lib/movies';
+import { pullAndStoreFromCSFDId } from '@/actions/movies/pull-from-csfd';
 
 import { watchlistItems, watchlists, users, movies } from './schema';
-import {addMovieToLocalDB, getMovieByCSFDId, getMovieByTitle} from './movies';
+import { addMovieToLocalDB, getMovieByCSFDId, getMovieByTitle } from './movies';
 
 import { db } from './index';
-import {pullAndStoreFromCSFDId} from "@/actions/movies/pull-from-csfd";
 
 export const getUserMovies = async (userEmail: string) => {
 	const user = await db
@@ -193,10 +193,9 @@ export const addMovieToWatchlist = async (
 	watchlistId: number,
 	movieData: MovieSearchItemProps
 ) => {
-	let movie : Movie | undefined = await getMovieByTitle(movieData.title);
+	let movie: Movie | undefined = await getMovieByTitle(movieData.title);
 
-	if (!movie)
-        movie = await pullAndStoreFromCSFDId(movieData.id, movieData.type);
+	movie ??= await pullAndStoreFromCSFDId(movieData.id, movieData.type);
 
 	if (!movie) throw new Error('Movie was not added to local DB');
 

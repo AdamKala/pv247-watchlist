@@ -23,11 +23,11 @@ export const movies = sqliteTable('movies', {
 	image: text('image'),
 	description: text('description'),
 	origins: text('origins'),
-    genres: text('genres'),
-    duration: text('duration'),
+	genres: text('genres'),
+	duration: text('duration'),
 	type: text('type').notNull(),
 	localRating: real('local_rating'),
-    primarySource: text('primary_source').notNull(),
+	primarySource: text('primary_source').notNull(),
 	csfdId: integer('csf_id').notNull().unique(),
 	csfdRating: real('csrf_rating'),
 	csfdLastFetched: text('csrd_last_fetched'),
@@ -173,13 +173,13 @@ export const movieVisits = sqliteTable(
 			.references(() => movies.id, { onDelete: 'cascade' }),
 
 		visitedAt: integer('visited_at').notNull(),
-        movieSeenAt: integer('movie_seen_at'),
+		movieSeenAt: integer('movie_seen_at')
 	},
 	t => ({
 		pk: primaryKey({ columns: [t.userEmail, t.movieId] }),
 		byUserVisited: index('idx_movie_visits_user_visited').on(
 			t.userEmail,
-			t.visitedAt,
+			t.visitedAt
 		)
 	})
 );

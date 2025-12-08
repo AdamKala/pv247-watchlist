@@ -1,5 +1,5 @@
-'use server'
-import {and, desc, eq} from 'drizzle-orm';
+'use server';
+import { and, desc, eq } from 'drizzle-orm';
 
 import { db } from '@/db';
 import { movieVisits, movies, users } from '@/db/schema';
@@ -34,44 +34,50 @@ export const getRecentlyVisitedMoviesByEmail = async (
 		.orderBy(desc(movieVisits.visitedAt))
 		.limit(limit);
 
-
 export const isMovieWatchedBy = async (userEmail: string, movieId: number) => {
-    const data = await db
-        .select({
-            movieSeenAt: movieVisits.movieSeenAt,
-        })
-        .from(movieVisits)
-        .where(
-            and(
-                eq(movieVisits.userEmail, userEmail),
-                eq(movieVisits.movieId, movieId)
-            )
-        )
-        .limit(1);
+	const data = await db
+		.select({
+			movieSeenAt: movieVisits.movieSeenAt
+		})
+		.from(movieVisits)
+		.where(
+			and(
+				eq(movieVisits.userEmail, userEmail),
+				eq(movieVisits.movieId, movieId)
+			)
+		)
+		.limit(1);
 
-    return data[0]
-}
+	return data[0];
+};
 
-export const setMovieWatchedAt = async (userEmail: string, movieId: number, date: number) => {
-    await db
-        .update(movieVisits)
-        .set({ movieSeenAt: date })
-        .where(
-            and(
-                eq(movieVisits.movieId, movieId),
-                eq(movieVisits.userEmail, userEmail)
-            )
-        );
-}
+export const setMovieWatchedAt = async (
+	userEmail: string,
+	movieId: number,
+	date: number
+) => {
+	await db
+		.update(movieVisits)
+		.set({ movieSeenAt: date })
+		.where(
+			and(
+				eq(movieVisits.movieId, movieId),
+				eq(movieVisits.userEmail, userEmail)
+			)
+		);
+};
 
-export const resetMovieWatchedAt = async (userEmail: string, movieId: number) : Promise<void> => {
-    await db
-        .update(movieVisits)
-        .set({ movieSeenAt: null })
-        .where(
-            and(
-                eq(movieVisits.movieId, movieId),
-                eq(movieVisits.userEmail, userEmail)
-            )
-        );
-}
+export const resetMovieWatchedAt = async (
+	userEmail: string,
+	movieId: number
+): Promise<void> => {
+	await db
+		.update(movieVisits)
+		.set({ movieSeenAt: null })
+		.where(
+			and(
+				eq(movieVisits.movieId, movieId),
+				eq(movieVisits.userEmail, userEmail)
+			)
+		);
+};

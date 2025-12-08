@@ -1,5 +1,6 @@
+import TMDB from '@blacktiger/tmdb';
+
 import { type movies, type watchlistItems, type watchlists } from '@/db/schema';
-import TMDB from "@blacktiger/tmdb";
 
 export type Movie = typeof movies.$inferSelect;
 export type NewMovie = typeof movies.$inferInsert;
@@ -7,7 +8,7 @@ export type MovieSearchItemProps = {
 	title: string;
 	posterUrl: string;
 	id: number;
-    csfdId: number;
+	csfdId: number;
 	origins: string[];
 	type: string;
 	year: string;
@@ -28,4 +29,4 @@ export type NewWatchlistItem = typeof watchlistItems.$inferInsert; // pro insert
 export type WatchList = typeof watchlists.$inferSelect;
 export type newWatchList = typeof watchlists.$inferInsert;
 
-export const TMDBService = new TMDB(process.env.TMDB_API_KEY || "");
+export const TMDBService = new TMDB(process.env.TMDB_API_KEY ?? '');

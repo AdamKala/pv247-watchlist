@@ -1,10 +1,11 @@
+import Link from 'next/link';
+
 import Card from '@/components/ui/Card';
 import EmptyState from '@/components/ui/EmptyState';
 
 import ListItem from './ListItem';
 import ScoreBadge from './ScoreBadge';
 import { clamp, formatCsDateTime } from './utils';
-import Link from "next/link";
 
 type HomePageProps = {
 	isLoggedIn: boolean;
@@ -158,7 +159,7 @@ const HomePage = ({
 							<div className="space-y-3">
 								{topMovies.map((m, idx) => (
 									<Link
-                                        href={`/movie?id=${m.id}`}
+										href={`/movie?id=${m.id}`}
 										key={m.id}
 										className="group flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-4 transition hover:border-white/15 hover:bg-white/[0.05]"
 									>

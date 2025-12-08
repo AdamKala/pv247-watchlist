@@ -64,9 +64,9 @@ const WatchlistDetailPage = async ({
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 				{watchlistItems.map(movie => (
 					<Link
-                        href={`/movie?id=${movie.id}`}
+						href={`/movie?id=${movie.id}`}
 						key={movie.id}
-						className="cursor-pointer flex flex-col rounded-xl border border-gray-700 bg-gray-900 p-4 shadow-md transition hover:border-blue-600 hover:shadow-lg"
+						className="flex cursor-pointer flex-col rounded-xl border border-gray-700 bg-gray-900 p-4 shadow-md transition hover:border-blue-600 hover:shadow-lg"
 					>
 						<div className="flex gap-4">
 							<div className="w-24 shrink-0">
