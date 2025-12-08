@@ -1,4 +1,5 @@
 import { getServerSession } from 'next-auth/next';
+import Link from 'next/link';
 
 import { type Movie } from '@/lib/movies';
 import { authOptions } from '@/auth';
@@ -12,7 +13,21 @@ const MovieCard = async ({ movie }: { movie: Movie }) => {
 	const session = await getServerSession(authOptions);
 
 	if (!session?.user?.email) {
-		return <div>Session invalid</div>;
+		return (
+			<main className="items-top flex justify-center text-white">
+				<div className="w-full max-w-md px-6 py-10">
+					<div className="rounded-2xl bg-white/5 p-8 shadow-lg backdrop-blur-md">
+						<p className="mb-6 text-sm text-white/80">Please log in.</p>
+						<Link
+							href="/login"
+							className="block w-full rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+						>
+							Sign In
+						</Link>
+					</div>
+				</div>
+			</main>
+		);
 	}
 	const userEmail: string = session.user.email;
 
