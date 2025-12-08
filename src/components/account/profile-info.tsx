@@ -55,20 +55,22 @@ const ProfileInfo = ({ user, updateProfile }: ProfileInfoProps) => {
 
 	return (
 		<div className="flex w-full flex-col gap-6 rounded-xl bg-black p-6 text-white shadow-lg">
-			<div className="flex w-full flex-col items-start gap-6 md:flex-row md:items-center">
-				<div className="group relative shrink-0">
+			<div className="flex flex-col gap-6 md:flex-row md:items-center">
+				<div className="group relative h-[90px] w-[90px] shrink-0">
 					<Image
 						src={previewImage ?? '/icons/default-user.svg'}
 						alt="Avatar"
 						width={90}
 						height={90}
-						className={`h-[90px] w-[90px] ${isEditing ? 'border-2 border-blue-600' : 'border-2 border-gray-600'} rounded-full object-cover`}
+						className={`h-[90px] w-[90px] rounded-full border-2 object-cover ${
+							isEditing ? 'border-blue-600' : 'border-gray-600'
+						}`}
 						priority
 					/>
 
 					{isEditing && (
 						<div className="absolute inset-0 flex flex-col items-center justify-center rounded-full bg-black/60 opacity-0 transition group-hover:opacity-100">
-							<label className="mb-1 cursor-pointer">
+							<label className="mb-1 cursor-pointer text-center">
 								<span className="text-sm text-blue-400">Change</span>
 								<input
 									type="file"
@@ -92,23 +94,29 @@ const ProfileInfo = ({ user, updateProfile }: ProfileInfoProps) => {
 					)}
 				</div>
 
-				<div className="flex w-full flex-1 flex-col gap-2">
+				<div className="flex w-full flex-col gap-2 md:flex-1">
 					<input
 						{...form.register('name')}
 						disabled={!isEditing}
-						className={`w-full rounded-lg bg-gray-900 px-3 py-2 text-lg font-bold text-white outline-none ${isEditing ? 'ring-1 ring-blue-600 focus:ring-2' : ''}`}
+						className={`w-full rounded-lg bg-gray-900 px-3 py-2 text-lg font-bold text-white outline-none ${
+							isEditing ? 'ring-1 ring-blue-600 focus:ring-2' : ''
+						}`}
 					/>
 					<textarea
 						{...form.register('description')}
 						rows={3}
 						disabled={!isEditing}
 						placeholder="Empty..."
-						className={`w-full resize-none rounded-lg bg-gray-900 px-3 py-2 text-white outline-none ${isEditing ? 'ring-1 ring-blue-600 focus:ring-2' : ''}`}
+						className={`w-full resize-none rounded-lg bg-gray-900 px-3 py-2 text-white outline-none ${
+							isEditing ? 'ring-1 ring-blue-600 focus:ring-2' : ''
+						}`}
 					/>
-					<p className="text-sm text-blue-400">{user.email}</p>
+					<p className="w-full text-sm break-words whitespace-normal text-blue-400">
+						{user.email}
+					</p>
 				</div>
 
-				<div className="ml-auto flex gap-4 self-start md:self-auto">
+				<div className="flex flex-wrap gap-2 md:ml-4 md:flex-col md:gap-4">
 					{isEditing ? (
 						<>
 							<button
@@ -131,7 +139,7 @@ const ProfileInfo = ({ user, updateProfile }: ProfileInfoProps) => {
 						</>
 					) : (
 						<button
-							className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold hover:bg-blue-700"
+							className="rounded-lg bg-blue-600 px-4 py-2 font-semibold hover:bg-blue-700"
 							onClick={() => setIsEditing(true)}
 						>
 							Edit Profile
