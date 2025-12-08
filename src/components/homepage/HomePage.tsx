@@ -85,57 +85,31 @@ const HomePage = ({
 								) : (
 									<div className="space-y-3">
 										{latestReviews.map(review => (
-											<ListItem
-												key={review.id}
-												title={
-													<>
-														{review.movieTitle ?? `Movie #${review.movieId}`}
-														{review.movieYear ? (
-															<span className="text-white/55">
-																{' '}
-																({review.movieYear})
-															</span>
-														) : null}
-													</>
-												}
-												meta="Latest review"
-												right={<ScoreBadge value={review.rating} />}
+											<Link
+												href={`/movie?id=${review.movieId}`}
+												key={review.movieId}
 											>
-												<span className="text-white/70">
-													{clamp(review.text, 90)}
-												</span>
-											</ListItem>
-										))}
-									</div>
-								)}
-							</Card>
-
-							<Card title="Last Visited" subtitle="Recently opened movie pages">
-								{lastVisited.length === 0 ? (
-									<EmptyState
-										title="No visits yet"
-										hint="Open a movie detail page and it’ll appear here."
-									/>
-								) : (
-									<div className="space-y-3">
-										{lastVisited.map(v => (
-											<ListItem
-												key={`${v.id}-${v.visitedAt}`}
-												title={
-													<>
-														{v.title}
-														{v.year ? (
-															<span className="text-white/55"> ({v.year})</span>
-														) : null}
-													</>
-												}
-												meta={formatCsDateTime(v.visitedAt)}
-												right={
-													<span className="rounded-full bg-white/5 px-2.5 py-1 text-xs text-white/70 ring-1 ring-white/10">
-														viewed
+												<ListItem
+													key={review.id}
+													title={
+														<>
+															{review.movieTitle ?? `Movie #${review.movieId}`}
+															{review.movieYear ? (
+																<span className="text-white/55">
+																	{' '}
+																	({review.movieYear})
+																</span>
+															) : null}
+														</>
+													}
+													meta="Latest review"
+													right={<ScoreBadge value={review.rating} />}
+												>
+													<span className="text-white/70">
+														{clamp(review.text, 90)}
 													</span>
-												}
-											/>
+												</ListItem>
+											</Link>
 										))}
 									</div>
 								)}
@@ -182,7 +156,6 @@ const HomePage = ({
 										</div>
 
 										<div className="flex items-center gap-2">
-											<span className="text-xs text-white/55">score</span>
 											<ScoreBadge value={Number(m.score)} />
 										</div>
 									</Link>
@@ -194,24 +167,30 @@ const HomePage = ({
 
 				{isLoggedIn ? (
 					<div className="lg:col-span-3">
-						<Card
-							title="Continue Watching"
-							subtitle="Next picks based on your activity"
-							className="h-full"
-						>
-							<div className="space-y-3">
-								{['Movie A — placeholder', 'Movie B — placeholder'].map(x => (
-									<div
-										key={x}
-										className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm text-white/75 ring-1 ring-white/5 transition hover:border-white/15 hover:bg-white/[0.05]"
-									>
-										{x}
-										<div className="mt-1 text-xs text-white/55">
-											We’ll replace this with real data later.
-										</div>
-									</div>
-								))}
-							</div>
+						<Card title="Last Visited" subtitle="Recently opened movie pages">
+							{lastVisited.length === 0 ? (
+								<EmptyState
+									title="No visits yet"
+									hint="Open a movie detail page and it’ll appear here."
+								/>
+							) : (
+								<div className="space-y-3">
+									{lastVisited.map(v => (
+										<ListItem
+											key={`${v.id}-${v.visitedAt}`}
+											title={
+												<>
+													{v.title}
+													{v.year ? (
+														<span className="text-white/55"> ({v.year})</span>
+													) : null}
+												</>
+											}
+											meta={formatCsDateTime(v.visitedAt)}
+										/>
+									))}
+								</div>
+							)}
 						</Card>
 					</div>
 				) : null}

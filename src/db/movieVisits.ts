@@ -28,9 +28,8 @@ export const getRecentlyVisitedMoviesByEmail = async (
 			visitedAt: movieVisits.visitedAt
 		})
 		.from(movieVisits)
-		.innerJoin(users, eq(movieVisits.userEmail, users.id))
 		.innerJoin(movies, eq(movieVisits.movieId, movies.id))
-		.where(eq(users.email, email))
+		.where(eq(movieVisits.userEmail, email))
 		.orderBy(desc(movieVisits.visitedAt))
 		.limit(limit);
 
