@@ -8,17 +8,18 @@ import {
 	addCommentToFavorite,
 	addFavoriteToGroup,
 	deleteFavoriteFromGroup,
+	deleteGroupCascade,
 	getGroupDetail,
-	joinPublicGroup,
-	requestJoinPrivateGroup,
-	resolveJoinRequest,
 	inviteUserByEmailToPrivateGroup,
+	joinPublicGroup,
 	kickGroupMember,
-	deleteGroupCascade
+	requestJoinPrivateGroup,
+	resolveJoinRequest
 } from '@/db/groups';
 
 type Props = {
 	params: Promise<{ id: string }>;
+	searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 const joinPublicAction = async (groupId: number) => {
@@ -46,17 +47,20 @@ const addFavoriteAction = async (groupId: number, formData: FormData) => {
 	const session = await getServerSession(authOptions);
 	if (!session?.user?.email) return;
 
-	const itemSymbol = String(formData.get('itemSymbol') ?? '').trim();
-	const title = String(formData.get('title') ?? '').trim();
+	const movieId = Number(formData.get('movieId'));
 	const comment = String(formData.get('comment') ?? '').trim();
-	if (!itemSymbol) return;
 
-	await addFavoriteToGroup(session.user.email, groupId, {
-		itemSymbol,
-		title,
+	if (!movieId || Number.isNaN(movieId)) {
+		redirect(`/groups/${groupId}?fav=invalid`);
+	}
+
+	const result = await addFavoriteToGroup(session.user.email, groupId, {
+		movieId,
 		comment
 	});
+
 	revalidatePath(`/groups/${groupId}`);
+	redirect(`/groups/${groupId}?fav=${result}`);
 };
 
 const deleteFavoriteAction = async (groupId: number, favoriteId: number) => {
@@ -141,7 +145,7 @@ const deleteGroupAction = async (groupId: number) => {
 	redirect('/groups');
 };
 
-const GroupDetailPage = async ({ params }: Props) => {
+const GroupDetailPage = async ({ params, searchParams }: Props) => {
 	const session = await getServerSession(authOptions);
 
 	if (!session?.user?.email) {
@@ -163,6 +167,9 @@ const GroupDetailPage = async ({ params }: Props) => {
 		);
 	}
 
+	const sp = (await searchParams) ?? {};
+	const favParam = Array.isArray(sp.fav) ? sp.fav[0] : sp.fav;
+
 	const data = await getGroupDetail(session.user.email, groupId);
 
 	if (!data) {
@@ -173,16 +180,51 @@ const GroupDetailPage = async ({ params }: Props) => {
 		);
 	}
 
-	const { group, me, canSeeContent, favorites, pendingRequests, members } =
-		data;
+	const {
+		group,
+		me,
+		canSeeContent,
+		favorites,
+		pendingRequests,
+		members,
+		movieOptions
+	} = data;
 
 	return (
-		<div className="space-y-6 p-8 text-white">
-			<div className="rounded-xl bg-black p-6 shadow-lg">
-				<div className="flex flex-wrap items-start justify-between gap-3">
-					<div>
-						<h1 className="text-3xl font-bold">{group.name}</h1>
-						<p className="mt-2 text-gray-300">
+		<div className="space-y-6 p-4 text-white sm:p-8">
+			{favParam && (
+				<div
+					className={`rounded-xl border p-4 ${
+						favParam === 'added'
+							? 'border-green-700 bg-green-900/30 text-green-200'
+							: favParam === 'duplicate'
+								? 'border-yellow-700 bg-yellow-900/30 text-yellow-200'
+								: 'border-red-700 bg-red-900/30 text-red-200'
+					}`}
+				>
+					<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+						<p className="break-words">
+							{favParam === 'added'
+								? 'Favorite added.'
+								: favParam === 'duplicate'
+									? 'You already added this movie as a favorite in this group.'
+									: 'Please select a movie first.'}
+						</p>
+						<Link
+							href={`/groups/${groupId}`}
+							className="rounded-lg bg-gray-800 px-3 py-1 text-sm hover:bg-gray-700"
+						>
+							Dismiss
+						</Link>
+					</div>
+				</div>
+			)}
+
+			<div className="rounded-xl bg-black p-5 shadow-lg sm:p-6">
+				<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+					<div className="min-w-0">
+						<h1 className="text-2xl font-bold sm:text-3xl">{group.name}</h1>
+						<p className="mt-2 break-words text-gray-300">
 							{group.description ?? 'No description'}
 						</p>
 						<p className="mt-3 text-sm text-gray-400">
@@ -236,7 +278,7 @@ const GroupDetailPage = async ({ params }: Props) => {
 			</div>
 
 			{me.isOwner && (
-				<div className="space-y-6 rounded-xl bg-gray-900 p-6 shadow-md">
+				<div className="space-y-6 rounded-xl bg-gray-900 p-5 shadow-md sm:p-6">
 					<h2 className="text-xl font-semibold">Owner tools</h2>
 
 					{group.visibility === 'private' && (
@@ -248,62 +290,75 @@ const GroupDetailPage = async ({ params }: Props) => {
 
 							<form
 								action={inviteByEmailAction.bind(null, groupId)}
-								className="mt-3 flex flex-col gap-2 md:flex-row"
+								className="mt-3 flex flex-col gap-2 sm:flex-row"
 							>
 								<input
 									name="email"
 									type="email"
 									placeholder="user@example.com"
-									className="flex-1 rounded-md border border-gray-700 bg-gray-900 px-4 py-2 outline-none focus:ring-2 focus:ring-blue-600"
+									className="w-full rounded-md border border-gray-700 bg-gray-900 px-4 py-2 outline-none focus:ring-2 focus:ring-blue-600 sm:flex-1"
 									required
 								/>
-								<button className="rounded-md bg-blue-600 px-4 py-2 font-semibold hover:bg-blue-700">
+								<button className="cursor-pointer rounded-md bg-blue-600 px-4 py-2 font-semibold hover:bg-blue-700 sm:w-auto">
 									Add to group
 								</button>
 							</form>
 						</div>
 					)}
 
-					<div className="rounded-xl bg-black p-4">
-						<div className="flex items-center justify-between">
-							<h3 className="font-semibold">Join requests</h3>
-							<span className="text-sm text-gray-400">
-								{pendingRequests.length} pending
-							</span>
-						</div>
-
-						{pendingRequests.length === 0 ? (
-							<p className="mt-3 text-gray-300">No pending requests.</p>
-						) : (
-							<div className="mt-4 space-y-3">
-								{pendingRequests.map(r => (
-									<div
-										key={r.id}
-										className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-700 bg-gray-900 p-4"
-									>
-										<div>
-											<p className="font-semibold">
-												{r.userName ?? 'Unknown user'}
-											</p>
-											<p className="text-sm text-gray-400">{r.userEmail}</p>
-										</div>
-										<div className="flex gap-2">
-											<form action={approveReqAction.bind(null, groupId, r.id)}>
-												<button className="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold hover:bg-green-700">
-													Approve
-												</button>
-											</form>
-											<form action={rejectReqAction.bind(null, groupId, r.id)}>
-												<button className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold hover:bg-red-700">
-													Reject
-												</button>
-											</form>
-										</div>
-									</div>
-								))}
+					{group.visibility === 'private' && (
+						<div className="rounded-xl bg-black p-4">
+							<div className="flex items-center justify-between">
+								<h3 className="font-semibold">Join requests</h3>
+								<span className="text-sm text-gray-400">
+									{pendingRequests.length} pending
+								</span>
 							</div>
-						)}
-					</div>
+
+							{pendingRequests.length === 0 ? (
+								<p className="mt-3 text-gray-300">No pending requests.</p>
+							) : (
+								<div className="mt-4 space-y-3">
+									{pendingRequests.map(r => (
+										<div
+											key={r.id}
+											className="rounded-lg border border-gray-700 bg-gray-900 p-4"
+										>
+											<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+												<div className="min-w-0">
+													<p className="font-semibold">
+														{r.userName ?? 'Unknown user'}
+													</p>
+													<p className="text-sm break-words text-gray-400">
+														{r.userEmail}
+													</p>
+												</div>
+
+												<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+													<form
+														action={approveReqAction.bind(null, groupId, r.id)}
+														className="w-full sm:w-auto"
+													>
+														<button className="w-full rounded-md bg-green-600 px-3 py-2 text-sm font-semibold hover:bg-green-700 sm:w-auto">
+															Approve
+														</button>
+													</form>
+													<form
+														action={rejectReqAction.bind(null, groupId, r.id)}
+														className="w-full sm:w-auto"
+													>
+														<button className="w-full rounded-md bg-red-600 px-3 py-2 text-sm font-semibold hover:bg-red-700 sm:w-auto">
+															Reject
+														</button>
+													</form>
+												</div>
+											</div>
+										</div>
+									))}
+								</div>
+							)}
+						</div>
+					)}
 
 					<div className="rounded-xl bg-black p-4">
 						<div className="flex items-center justify-between">
@@ -315,34 +370,39 @@ const GroupDetailPage = async ({ params }: Props) => {
 							<p className="mt-3 text-gray-300">No members found.</p>
 						) : (
 							<div className="mt-4 space-y-3">
-								{members.map((m: any) => (
+								{members.map(m => (
 									<div
 										key={m.userId}
-										className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-700 bg-gray-900 p-4"
+										className="rounded-lg border border-gray-700 bg-gray-900 p-4"
 									>
-										<div>
-											<p className="font-semibold">
-												{m.userName ?? 'Unknown'}{' '}
-												<span className="ml-2 rounded-full bg-gray-800 px-2 py-0.5 text-xs text-gray-200">
-													{m.role}
-												</span>
-											</p>
-											<p className="text-sm text-gray-400">{m.userEmail}</p>
-										</div>
+										<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+											<div className="min-w-0">
+												<p className="font-semibold">
+													{m.userName ?? 'Unknown'}{' '}
+													<span className="ml-2 rounded-full bg-gray-800 px-2 py-0.5 text-xs text-gray-200">
+														{m.role}
+													</span>
+												</p>
+												<p className="text-sm break-words text-gray-400">
+													{m.userEmail}
+												</p>
+											</div>
 
-										{m.role !== 'owner' && (
-											<form
-												action={kickMemberAction.bind(
-													null,
-													groupId,
-													Number(m.userId)
-												)}
-											>
-												<button className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold hover:bg-red-700">
-													Kick
-												</button>
-											</form>
-										)}
+											{m.role !== 'owner' && (
+												<form
+													action={kickMemberAction.bind(
+														null,
+														groupId,
+														m.userId
+													)}
+													className="w-full sm:w-auto"
+												>
+													<button className="w-full rounded-md bg-red-600 px-3 py-2 text-sm font-semibold hover:bg-red-700 sm:w-auto">
+														Kick
+													</button>
+												</form>
+											)}
+										</div>
 									</div>
 								))}
 							</div>
@@ -353,35 +413,46 @@ const GroupDetailPage = async ({ params }: Props) => {
 
 			{canSeeContent ? (
 				<>
-					<div className="rounded-xl bg-gray-900 p-6 shadow-md">
+					<div className="rounded-xl bg-gray-900 p-5 shadow-md sm:p-6">
 						<h2 className="text-xl font-semibold">Add your favorite</h2>
 
 						<form
 							action={addFavoriteAction.bind(null, groupId)}
-							className="mt-4 grid gap-3 md:grid-cols-2"
+							className="mt-4 space-y-3"
 						>
-							<input
-								name="itemSymbol"
-								placeholder="Movie/Show ID"
-								className="rounded-md border border-gray-700 bg-black px-4 py-2 outline-none focus:ring-2 focus:ring-blue-600"
-								required
-							/>
-							<input
-								name="title"
-								placeholder="Title (optional)"
-								className="rounded-md border border-gray-700 bg-black px-4 py-2 outline-none focus:ring-2 focus:ring-blue-600"
-							/>
-							<textarea
-								name="comment"
-								placeholder="Comment (optional)"
-								className="resize-none rounded-md border border-gray-700 bg-black px-4 py-2 outline-none focus:ring-2 focus:ring-blue-600 md:col-span-2"
-								rows={3}
-							/>
-							<div className="md:col-span-2">
-								<button className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold hover:bg-blue-700">
-									Add
-								</button>
+							<div>
+								<select
+									id="movieId"
+									name="movieId"
+									className="w-full rounded-md border border-gray-700 bg-black px-4 py-2 outline-none focus:ring-2 focus:ring-blue-600"
+									required
+									defaultValue=""
+								>
+									<option value="" disabled>
+										Select a movie…
+									</option>
+									{movieOptions.map(m => (
+										<option key={m.id} value={m.id}>
+											{m.title}
+											{m.year ? ` (${m.year})` : ''}
+										</option>
+									))}
+								</select>
 							</div>
+
+							<div>
+								<textarea
+									id="comment"
+									name="comment"
+									placeholder="Comment (optional)"
+									className="w-full resize-none rounded-md border border-gray-700 bg-black px-4 py-2 outline-none focus:ring-2 focus:ring-blue-600"
+									rows={3}
+								/>
+							</div>
+
+							<button className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold hover:bg-blue-700">
+								Add
+							</button>
 						</form>
 					</div>
 
@@ -391,31 +462,31 @@ const GroupDetailPage = async ({ params }: Props) => {
 						{favorites.length === 0 ? (
 							<p className="text-gray-300">No favorites yet.</p>
 						) : (
-							favorites.map((f: any) => (
+							favorites.map(f => (
 								<div
 									key={f.id}
 									className="rounded-xl border border-gray-700 bg-black p-5 shadow-md"
 								>
-									<div className="flex flex-wrap items-start justify-between gap-3">
-										<div>
+									<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+										<div className="min-w-0">
 											<p className="text-lg font-bold">
-												{f.title ?? f.itemSymbol}{' '}
-												<span className="text-sm font-normal text-gray-400">
-													({f.itemSymbol})
-												</span>
+												{f.title ?? 'Unknown movie'}
 											</p>
 											<p className="text-sm text-gray-400">
 												Added by {f.userName ?? 'Unknown'}
 											</p>
 											{f.comment ? (
-												<p className="mt-2 text-gray-200">{f.comment}</p>
+												<p className="mt-2 break-words text-gray-200">
+													{f.comment}
+												</p>
 											) : null}
 										</div>
 
 										<form
 											action={deleteFavoriteAction.bind(null, groupId, f.id)}
+											className="w-full sm:w-auto"
 										>
-											<button className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold hover:bg-red-700">
+											<button className="w-full rounded-md bg-red-600 px-3 py-2 text-sm font-semibold hover:bg-red-700 sm:w-auto">
 												Delete
 											</button>
 										</form>
@@ -430,12 +501,12 @@ const GroupDetailPage = async ({ params }: Props) => {
 											<p className="text-sm text-gray-400">No comments yet.</p>
 										) : (
 											<div className="space-y-2">
-												{f.comments.map((c: any) => (
+												{f.comments.map(c => (
 													<div
 														key={c.id}
 														className="rounded-lg bg-gray-900 p-3"
 													>
-														<p className="text-sm text-gray-300">
+														<p className="text-sm break-words text-gray-300">
 															<span className="font-semibold text-white">
 																{c.userName ?? 'Unknown'}:
 															</span>{' '}
@@ -448,14 +519,15 @@ const GroupDetailPage = async ({ params }: Props) => {
 
 										<form
 											action={addCommentAction.bind(null, groupId, f.id)}
-											className="flex gap-2"
+											className="flex flex-col gap-2 sm:flex-row"
 										>
 											<input
 												name="comment"
+												required
 												placeholder="Write a comment…"
-												className="flex-1 rounded-md border border-gray-700 bg-black px-3 py-2 outline-none focus:ring-2 focus:ring-blue-600"
+												className="w-full rounded-md border border-gray-700 bg-black px-3 py-2 outline-none focus:ring-2 focus:ring-blue-600 sm:flex-1"
 											/>
-											<button className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold hover:bg-blue-700">
+											<button className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold hover:bg-blue-700 sm:w-auto">
 												Send
 											</button>
 										</form>

@@ -1,13 +1,14 @@
-import { and, eq, inArray, desc } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray } from 'drizzle-orm';
 
 import { db } from '@/db';
 import {
-	users,
-	groups,
-	groupMembers,
-	groupJoinRequests,
+	groupFavoriteComments,
 	groupFavorites,
-	groupFavoriteComments
+	groupJoinRequests,
+	groupMembers,
+	groups,
+	movies,
+	users
 } from '@/db/schema';
 
 const now = () => Date.now();
@@ -21,24 +22,94 @@ const getUserIdByEmail = async (email: string) => {
 	return user?.id ?? null;
 };
 
+export type GroupVisibility = 'public' | 'private';
+export type JoinRequestStatus = 'pending' | 'approved' | 'rejected';
+
 export type GroupListItem = {
 	id: number;
 	name: string;
 	description: string | null;
-	visibility: 'public' | 'private';
+	visibility: GroupVisibility;
 	ownerName: string | null;
 	isMember: boolean;
 	isOwner: boolean;
-	joinRequestStatus: 'pending' | 'approved' | 'rejected' | null;
+	joinRequestStatus: JoinRequestStatus | null;
+};
+
+export type MovieOption = {
+	id: number;
+	title: string;
+	year: number | null;
+};
+
+export type JoinRequestSummary = {
+	id: number;
+	userId: number;
+	userName: string | null;
+	userEmail: string | null;
+	createdAt: number;
+};
+
+export type GroupMemberSummary = {
+	userId: number;
+	userName: string | null;
+	userEmail: string | null;
+	userImage: string | null;
+	role: 'owner' | 'member';
+	joinedAt: number;
+};
+
+export type GroupFavoriteCommentSummary = {
+	id: number;
+	favoriteId: number;
+	comment: string;
+	createdAt: number;
+	userId: number;
+	userName: string | null;
+	userImage: string | null;
+};
+
+export type GroupFavoriteSummary = {
+	id: number;
+	title: string | null;
+	comment: string | null;
+	createdAt: number;
+	userId: number;
+	userName: string | null;
+	userImage: string | null;
+	comments: GroupFavoriteCommentSummary[];
+};
+
+export type GroupDetailResult = {
+	group: {
+		id: number;
+		name: string;
+		description: string | null;
+		visibility: GroupVisibility;
+		ownerId: number;
+		ownerName: string | null;
+	};
+	me: {
+		userId: number;
+		isMember: boolean;
+		isOwner: boolean;
+		joinRequestStatus: JoinRequestStatus | null;
+	};
+	canSeeContent: boolean;
+	movieOptions: MovieOption[];
+	favorites: GroupFavoriteSummary[];
+	pendingRequests: JoinRequestSummary[];
+	members: GroupMemberSummary[];
 };
 
 export const getGroupsOverview = async (userEmail: string) => {
 	const userId = await getUserIdByEmail(userEmail);
-	if (!userId)
+	if (!userId) {
 		return {
 			myGroups: [] as GroupListItem[],
 			allGroups: [] as GroupListItem[]
 		};
+	}
 
 	const all = await db
 		.select({
@@ -69,10 +140,7 @@ export const getGroupsOverview = async (userEmail: string) => {
 		.from(groupJoinRequests)
 		.where(eq(groupJoinRequests.userId, userId));
 
-	const requestStatusByGroup = new Map<
-		number,
-		'pending' | 'approved' | 'rejected'
-	>();
+	const requestStatusByGroup = new Map<number, JoinRequestStatus>();
 	for (const r of requests) requestStatusByGroup.set(r.groupId, r.status);
 
 	const allGroups: GroupListItem[] = all.map(g => {
@@ -82,7 +150,7 @@ export const getGroupsOverview = async (userEmail: string) => {
 			id: g.id,
 			name: g.name,
 			description: g.description ?? null,
-			visibility: g.visibility as 'public' | 'private',
+			visibility: g.visibility as GroupVisibility,
 			ownerName: g.ownerName ?? null,
 			isMember,
 			isOwner: role === 'owner' || g.ownerId === userId,
@@ -97,7 +165,7 @@ export const getGroupsOverview = async (userEmail: string) => {
 
 export const createGroup = async (
 	userEmail: string,
-	data: { name: string; description?: string; visibility: 'public' | 'private' }
+	data: { name: string; description?: string; visibility: GroupVisibility }
 ) => {
 	const userId = await getUserIdByEmail(userEmail);
 	if (!userId) throw new Error('Not authorized');
@@ -128,7 +196,10 @@ export const createGroup = async (
 	return groupId;
 };
 
-export const getGroupDetail = async (userEmail: string, groupId: number) => {
+export const getGroupDetail = async (
+	userEmail: string,
+	groupId: number
+): Promise<GroupDetailResult | null> => {
 	const userId = await getUserIdByEmail(userEmail);
 	if (!userId) throw new Error('Not authorized');
 
@@ -170,17 +241,23 @@ export const getGroupDetail = async (userEmail: string, groupId: number) => {
 	const isMember = !!member;
 	const isOwner = member?.role === 'owner' || group.ownerId === userId;
 
-	const canSeeContent = group.visibility === 'public' ? isMember : isMember;
+	const canSeeContent = isMember;
 
-	let favorites: any[] = [];
-	let pendingRequests: any[] = [];
-	let members: any[] = [];
+	let favorites: GroupFavoriteSummary[] = [];
+	let pendingRequests: JoinRequestSummary[] = [];
+	let members: GroupMemberSummary[] = [];
+	let movieOptions: MovieOption[] = [];
 
 	if (canSeeContent) {
+		movieOptions = await db
+			.select({ id: movies.id, title: movies.title, year: movies.year })
+			.from(movies)
+			.orderBy(asc(movies.title))
+			.limit(500);
+
 		const favs = await db
 			.select({
 				id: groupFavorites.id,
-				itemSymbol: groupFavorites.itemSymbol,
 				title: groupFavorites.title,
 				comment: groupFavorites.comment,
 				createdAt: groupFavorites.createdAt,
@@ -194,7 +271,8 @@ export const getGroupDetail = async (userEmail: string, groupId: number) => {
 			.orderBy(desc(groupFavorites.createdAt));
 
 		const favIds = favs.map(f => f.id);
-		const comments =
+
+		const comments: GroupFavoriteCommentSummary[] =
 			favIds.length === 0
 				? []
 				: await db
@@ -212,7 +290,7 @@ export const getGroupDetail = async (userEmail: string, groupId: number) => {
 						.where(inArray(groupFavoriteComments.favoriteId, favIds))
 						.orderBy(desc(groupFavoriteComments.createdAt));
 
-		const commentsByFav = new Map<number, any[]>();
+		const commentsByFav = new Map<number, GroupFavoriteCommentSummary[]>();
 		for (const c of comments) {
 			commentsByFav.set(c.favoriteId, [
 				...(commentsByFav.get(c.favoriteId) ?? []),
@@ -244,9 +322,10 @@ export const getGroupDetail = async (userEmail: string, groupId: number) => {
 				)
 			)
 			.orderBy(desc(groupJoinRequests.createdAt));
+
 		members = await db
 			.select({
-				userId: users.id,
+				userId: groupMembers.userId,
 				userName: users.name,
 				userEmail: users.email,
 				userImage: users.image,
@@ -260,17 +339,15 @@ export const getGroupDetail = async (userEmail: string, groupId: number) => {
 	}
 
 	return {
-		group: {
-			...group,
-			visibility: group.visibility as 'public' | 'private'
-		},
+		group: { ...group, visibility: group.visibility as GroupVisibility },
 		me: {
 			userId,
 			isMember,
 			isOwner,
-			joinRequestStatus: joinReq?.status ?? null
+			joinRequestStatus: (joinReq?.status as JoinRequestStatus) ?? null
 		},
 		canSeeContent,
+		movieOptions,
 		favorites,
 		pendingRequests,
 		members
@@ -410,11 +487,13 @@ export const resolveJoinRequest = async (
 	}
 };
 
+export type AddFavoriteResult = 'added' | 'duplicate';
+
 export const addFavoriteToGroup = async (
 	userEmail: string,
 	groupId: number,
-	payload: { itemSymbol: string; title?: string; comment?: string }
-) => {
+	payload: { movieId: number; comment?: string }
+): Promise<AddFavoriteResult> => {
 	const userId = await getUserIdByEmail(userEmail);
 	if (!userId) throw new Error('Not authorized');
 
@@ -427,19 +506,30 @@ export const addFavoriteToGroup = async (
 		.get();
 	if (!member) throw new Error('Must be a member');
 
+	const movie = await db
+		.select({ title: movies.title })
+		.from(movies)
+		.where(eq(movies.id, payload.movieId))
+		.get();
+	if (!movie) throw new Error('Movie not found');
+
 	const t = now();
-	await db
+
+	const inserted = await db
 		.insert(groupFavorites)
 		.values({
 			groupId,
 			userId,
-			itemSymbol: payload.itemSymbol.trim(),
-			title: (payload.title ?? '').trim() || null,
+			itemSymbol: String(payload.movieId),
+			title: movie.title,
 			comment: (payload.comment ?? '').trim() || null,
 			createdAt: t,
 			updatedAt: t
 		})
-		.onConflictDoNothing();
+		.onConflictDoNothing()
+		.returning({ id: groupFavorites.id });
+
+	return inserted.length > 0 ? 'added' : 'duplicate';
 };
 
 export const deleteFavoriteFromGroup = async (
@@ -466,6 +556,9 @@ export const deleteFavoriteFromGroup = async (
 	const canDelete = fav.userId === userId || group.ownerId === userId;
 	if (!canDelete) throw new Error('Forbidden');
 
+	await db
+		.delete(groupFavoriteComments)
+		.where(eq(groupFavoriteComments.favoriteId, favoriteId));
 	await db.delete(groupFavorites).where(eq(groupFavorites.id, favoriteId));
 };
 
@@ -507,7 +600,7 @@ export const addCommentToFavorite = async (
 export const updateGroup = async (
 	ownerEmail: string,
 	groupId: number,
-	data: { name: string; description?: string; visibility: 'public' | 'private' }
+	data: { name: string; description?: string; visibility: GroupVisibility }
 ) => {
 	const ownerId = await getUserIdByEmail(ownerEmail);
 	if (!ownerId) throw new Error('Not authorized');
@@ -546,7 +639,7 @@ export const inviteUserByEmailToPrivateGroup = async (
 	if (!group) throw new Error('Group not found');
 	if (group.ownerId !== ownerId) throw new Error('Forbidden');
 	if (group.visibility !== 'private')
-		throw new Error('Invites by email are only for private groups');
+		throw new Error('Invites are only for private groups');
 
 	const invitee = await db
 		.select()
@@ -554,27 +647,16 @@ export const inviteUserByEmailToPrivateGroup = async (
 		.where(eq(users.email, inviteEmail.trim().toLowerCase()))
 		.get();
 
-	if (!invitee) {
-		throw new Error('User with this email does not exist yet');
-	}
+	if (!invitee) throw new Error('User with this email does not exist yet');
 
 	await db
 		.insert(groupMembers)
-		.values({
-			groupId,
-			userId: invitee.id,
-			role: 'member',
-			joinedAt: now()
-		})
+		.values({ groupId, userId: invitee.id, role: 'member', joinedAt: now() })
 		.onConflictDoNothing();
 
 	await db
 		.update(groupJoinRequests)
-		.set({
-			status: 'approved',
-			resolvedAt: now(),
-			resolvedById: ownerId
-		})
+		.set({ status: 'approved', resolvedAt: now(), resolvedById: ownerId })
 		.where(
 			and(
 				eq(groupJoinRequests.groupId, groupId),
@@ -598,7 +680,6 @@ export const kickGroupMember = async (
 		.get();
 	if (!group) throw new Error('Group not found');
 	if (group.ownerId !== ownerId) throw new Error('Forbidden');
-
 	if (memberUserId === group.ownerId) throw new Error('Cannot kick the owner');
 
 	await db
@@ -648,12 +729,9 @@ export const deleteGroupCascade = async (
 	}
 
 	await db.delete(groupFavorites).where(eq(groupFavorites.groupId, groupId));
-
 	await db
 		.delete(groupJoinRequests)
 		.where(eq(groupJoinRequests.groupId, groupId));
-
 	await db.delete(groupMembers).where(eq(groupMembers.groupId, groupId));
-
 	await db.delete(groups).where(eq(groups.id, groupId));
 };

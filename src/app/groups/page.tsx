@@ -18,12 +18,12 @@ const GroupsPage = async () => {
 	const { myGroups, allGroups } = await getGroupsOverview(session.user.email);
 
 	return (
-		<div className="space-y-8 p-8 text-white">
-			<div className="flex items-center justify-between">
-				<h1 className="text-3xl font-bold">Groups</h1>
+		<div className="space-y-8 p-4 text-white sm:p-8">
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+				<h1 className="text-2xl font-bold sm:text-3xl">Groups</h1>
 				<Link
 					href="/groups/create"
-					className="rounded-lg bg-blue-600 px-4 py-2 font-semibold transition hover:bg-blue-700"
+					className="w-full rounded-lg bg-blue-600 px-4 py-2 text-center font-semibold transition hover:bg-blue-700 sm:w-auto"
 				>
 					Create new group
 				</Link>
@@ -41,13 +41,15 @@ const GroupsPage = async () => {
 								href={`/groups/${g.id}`}
 								className="rounded-xl border border-gray-700 bg-gray-900 p-4 shadow-md transition hover:border-blue-600"
 							>
-								<div className="flex items-center justify-between">
-									<h3 className="text-lg font-bold">{g.name}</h3>
-									<span className="rounded-full bg-gray-800 px-2 py-1 text-xs text-gray-200">
+								<div className="flex min-w-0 items-center justify-between gap-2">
+									<h3 className="min-w-0 text-lg font-bold break-words">
+										{g.name}
+									</h3>
+									<span className="shrink-0 rounded-full bg-gray-800 px-2 py-1 text-xs text-gray-200">
 										{g.visibility}
 									</span>
 								</div>
-								<p className="mt-2 text-sm text-gray-400">
+								<p className="mt-2 text-sm break-words text-gray-400">
 									{g.description ?? 'No description'}
 								</p>
 							</Link>
@@ -65,16 +67,18 @@ const GroupsPage = async () => {
 							href={`/groups/${g.id}`}
 							className="rounded-xl border border-gray-700 bg-gray-900 p-4 shadow-md transition hover:border-blue-600"
 						>
-							<div className="flex items-center justify-between">
-								<h3 className="text-lg font-bold">{g.name}</h3>
-								<span className="rounded-full bg-gray-800 px-2 py-1 text-xs text-gray-200">
+							<div className="flex min-w-0 items-center justify-between gap-2">
+								<h3 className="min-w-0 text-lg font-bold break-words">
+									{g.name}
+								</h3>
+								<span className="shrink-0 rounded-full bg-gray-800 px-2 py-1 text-xs text-gray-200">
 									{g.visibility}
 								</span>
 							</div>
-							<p className="mt-2 text-sm text-gray-400">
+							<p className="mt-2 text-sm break-words text-gray-400">
 								{g.description ?? 'No description'}
 							</p>
-							<p className="mt-3 text-xs text-gray-500">
+							<p className="mt-3 text-xs break-words text-gray-500">
 								Owner: {g.ownerName ?? 'Unknown'}
 							</p>
 
