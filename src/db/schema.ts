@@ -23,8 +23,11 @@ export const movies = sqliteTable('movies', {
 	image: text('image'),
 	description: text('description'),
 	origins: text('origins'),
-	type: text('type'),
+	genres: text('genres'),
+	duration: text('duration'),
+	type: text('type').notNull(),
 	localRating: real('local_rating'),
+	primarySource: text('primary_source').notNull(),
 	csfdId: integer('csf_id').notNull().unique(),
 	csfdRating: real('csrf_rating'),
 	csfdLastFetched: text('csrd_last_fetched'),
@@ -161,20 +164,21 @@ export const reviews = sqliteTable('reviews', {
 export const movieVisits = sqliteTable(
 	'movie_visits',
 	{
-		userId: integer('user_id')
+		userEmail: text('user_email')
 			.notNull()
-			.references(() => users.id, { onDelete: 'cascade' }),
+			.references(() => users.email, { onDelete: 'cascade' }),
 
 		movieId: integer('movie_id')
 			.notNull()
 			.references(() => movies.id, { onDelete: 'cascade' }),
 
-		visitedAt: integer('visited_at').notNull()
+		visitedAt: integer('visited_at').notNull(),
+		movieSeenAt: integer('movie_seen_at')
 	},
 	t => ({
-		pk: primaryKey({ columns: [t.userId, t.movieId] }),
+		pk: primaryKey({ columns: [t.userEmail, t.movieId] }),
 		byUserVisited: index('idx_movie_visits_user_visited').on(
-			t.userId,
+			t.userEmail,
 			t.visitedAt
 		)
 	})

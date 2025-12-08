@@ -88,6 +88,7 @@ const SearchPage = () => {
 										poster: string;
 										id: number;
 										year: string;
+										csfdId: number;
 									},
 									idx: Key
 								) => (
@@ -97,6 +98,7 @@ const SearchPage = () => {
 										posterUrl={item.poster}
 										id={item.id}
 										origins={item.origins}
+										csfdId={item.id}
 										type="movie"
 										year={item.year}
 									/>
@@ -120,6 +122,7 @@ const SearchPage = () => {
 										poster: string;
 										id: number;
 										year: string;
+										csfdId: number;
 									},
 									idx: Key
 								) => (
@@ -128,6 +131,7 @@ const SearchPage = () => {
 										title={item.title}
 										posterUrl={item.poster}
 										id={item.id}
+										csfdId={item.id}
 										origins={item.origins}
 										type="series"
 										year={item.year}

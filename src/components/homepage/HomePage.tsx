@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import Card from '@/components/ui/Card';
 import EmptyState from '@/components/ui/EmptyState';
 
@@ -156,7 +158,8 @@ const HomePage = ({
 						) : (
 							<div className="space-y-3">
 								{topMovies.map((m, idx) => (
-									<div
+									<Link
+										href={`/movie?id=${m.id}`}
 										key={m.id}
 										className="group flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-4 transition hover:border-white/15 hover:bg-white/[0.05]"
 									>
@@ -182,7 +185,7 @@ const HomePage = ({
 											<span className="text-xs text-white/55">score</span>
 											<ScoreBadge value={Number(m.score)} />
 										</div>
-									</div>
+									</Link>
 								))}
 							</div>
 						)}

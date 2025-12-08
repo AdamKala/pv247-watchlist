@@ -22,6 +22,7 @@ const EditWatchlistPage = (props: Props) => {
 				description: props.watchlist.description ?? '',
 				movies: props.initialItems.map(item => ({
 					id: item.id,
+					csfdId: item.csfdId,
 					title: item.title,
 					posterUrl: item.image ?? '/icons/default-movie.svg',
 					origins: item.origins ? item.origins.split(',') : [],

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import ModalMovie from '@/components/ui/modal-movie';
 import WatchlistSelect from '@/components/watchlist/watchlist-select';
@@ -52,12 +53,20 @@ const MovieSearchItem = (movieData: MovieSearchItemProps) => {
 				</div>
 
 				{watchlists && (
-					<button
-						className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700"
-						onClick={() => setOpen(true)}
-					>
-						Add
-					</button>
+					<div className="flex flex-wrap gap-2">
+						<button
+							className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700"
+							onClick={() => setOpen(true)}
+						>
+							Add
+						</button>
+						<Link
+							href={`/movie?csfdId=${movieData.csfdId}&type=${movieData.type}`}
+							className="rounded-lg bg-blue-800 px-4 py-2 font-semibold text-white hover:bg-blue-800"
+						>
+							Show detail
+						</Link>
+					</div>
 				)}
 			</div>
 
