@@ -23,12 +23,14 @@ const createGroupAction = async (formData: FormData) => {
 };
 
 const CreateGroupPage = () => (
-	<div className="p-8 text-white">
-		<h1 className="mb-6 text-3xl font-bold">Create New Group</h1>
+	<div className="p-4 text-white sm:p-8">
+		<h1 className="mb-4 text-2xl font-bold sm:mb-6 sm:text-3xl">
+			Create New Group
+		</h1>
 
 		<form
 			action={createGroupAction}
-			className="space-y-4 rounded-xl bg-black p-6 shadow-lg"
+			className="space-y-4 rounded-xl bg-black p-4 shadow-lg sm:p-6"
 		>
 			<div>
 				<label className="mb-2 block" htmlFor="name">
@@ -72,7 +74,7 @@ const CreateGroupPage = () => (
 				</select>
 			</div>
 
-			<button className="rounded-md bg-blue-600 px-4 py-2 font-semibold transition hover:bg-blue-700">
+			<button className="w-full rounded-md bg-blue-600 px-4 py-2 font-semibold transition hover:bg-blue-700 sm:w-auto">
 				Create group
 			</button>
 		</form>

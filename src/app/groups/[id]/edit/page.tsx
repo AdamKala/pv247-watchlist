@@ -48,7 +48,7 @@ const GroupEditPage = async ({ params }: Props) => {
 
 	if (!data) {
 		return (
-			<div className="p-8 text-white">
+			<div className="p-4 text-white sm:p-8">
 				<p className="text-red-400">Group not found.</p>
 			</div>
 		);
@@ -56,7 +56,7 @@ const GroupEditPage = async ({ params }: Props) => {
 
 	if (!data.me.isOwner) {
 		return (
-			<div className="p-8 text-white">
+			<div className="p-4 text-white sm:p-8">
 				<p className="text-red-400">Forbidden (only owner can edit).</p>
 			</div>
 		);
@@ -65,12 +65,14 @@ const GroupEditPage = async ({ params }: Props) => {
 	const g = data.group;
 
 	return (
-		<div className="p-8 text-white">
-			<h1 className="mb-6 text-3xl font-bold">Edit Group</h1>
+		<div className="p-4 text-white sm:p-8">
+			<h1 className="mb-4 text-2xl font-bold sm:mb-6 sm:text-3xl">
+				Edit Group
+			</h1>
 
 			<form
 				action={updateGroupAction.bind(null, groupId)}
-				className="space-y-4 rounded-xl bg-black p-6 shadow-lg"
+				className="space-y-4 rounded-xl bg-black p-4 shadow-lg sm:p-6"
 			>
 				<div>
 					<label className="mb-2 block" htmlFor="name">
@@ -114,14 +116,14 @@ const GroupEditPage = async ({ params }: Props) => {
 					</select>
 				</div>
 
-				<div className="flex gap-3">
-					<button className="rounded-lg bg-blue-600 px-4 py-2 font-semibold hover:bg-blue-700">
+				<div className="flex flex-col gap-3 sm:flex-row">
+					<button className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold hover:bg-blue-700 sm:w-auto">
 						Save changes
 					</button>
 
 					<a
 						href={`/groups/${groupId}`}
-						className="rounded-lg bg-gray-700 px-4 py-2 font-semibold hover:bg-gray-600"
+						className="w-full rounded-lg bg-gray-700 px-4 py-2 text-center font-semibold hover:bg-gray-600 sm:w-auto"
 					>
 						Cancel
 					</a>
