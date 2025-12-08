@@ -73,17 +73,17 @@ const ClientNavigation = ({ session }: { session: Session | null }) => {
 	};
 
 	return (
-		<nav className="sticky top-0 z-50 bg-black shadow-md">
-			<div className="container mx-auto px-4">
-				<div className="flex items-center justify-between py-4">
-					{/* Desktop nav (visible like now) */}
-					<ul className="hidden flex-wrap items-center gap-3 sm:flex sm:gap-6">
+		<nav className="sticky top-0 z-50 w-full bg-black shadow-md">
+			<div className="container mx-auto max-w-full overflow-x-auto px-4">
+				<div className="flex flex-wrap items-center justify-between py-4">
+					{/* Desktop nav (md+) */}
+					<ul className="hidden flex-wrap items-center gap-6 md:flex">
 						{links.map(link => (
 							<li key={link.label}>{renderLink(link, 'desktop')}</li>
 						))}
 					</ul>
 
-					<ul className="hidden items-center gap-3 sm:flex sm:gap-6">
+					<ul className="hidden items-center gap-3 md:flex">
 						{session && (
 							<li>
 								<Link
@@ -94,7 +94,6 @@ const ClientNavigation = ({ session }: { session: Session | null }) => {
 								</Link>
 							</li>
 						)}
-
 						<li>
 							{session ? (
 								<LogoutButton className={baseItemClass} />
@@ -109,10 +108,11 @@ const ClientNavigation = ({ session }: { session: Session | null }) => {
 						</li>
 					</ul>
 
-					{/* Mobile header + dropdown toggle */}
-					<div className="flex w-full items-center justify-between sm:hidden">
-						<span className="text-lg font-semibold text-white">Menu</span>
-
+					{/* Mobile header + dropdown toggle (below md) */}
+					<div className="flex w-full items-center justify-between md:hidden">
+						<span className="truncate text-lg font-semibold text-white">
+							Menu
+						</span>
 						<button
 							type="button"
 							onClick={() => setOpen(prev => !prev)}
@@ -123,9 +123,7 @@ const ClientNavigation = ({ session }: { session: Session | null }) => {
 							<span className="sr-only">
 								{open ? 'Close menu' : 'Open menu'}
 							</span>
-
 							{open ? (
-								// X icon
 								<svg
 									width="24"
 									height="24"
@@ -142,7 +140,6 @@ const ClientNavigation = ({ session }: { session: Session | null }) => {
 									/>
 								</svg>
 							) : (
-								// hamburger icon
 								<svg
 									width="24"
 									height="24"
@@ -165,15 +162,13 @@ const ClientNavigation = ({ session }: { session: Session | null }) => {
 
 				{/* Mobile dropdown */}
 				{open && (
-					<div id="mobile-nav" className="sm:hidden">
-						<div className="mb-4 rounded-2xl border border-white/10 bg-black/95 p-2 shadow-lg backdrop-blur">
+					<div id="mobile-nav" className="w-full md:hidden">
+						<div className="mb-4 overflow-hidden rounded-2xl border border-white/10 bg-black/95 p-2 shadow-lg backdrop-blur">
 							<ul className="flex flex-col gap-1">
 								{links.map(link => (
 									<li key={link.label}>{renderLink(link, 'mobile')}</li>
 								))}
-
 								<div className="my-2 h-px w-full bg-white/10" />
-
 								{session && (
 									<li>
 										<Link
@@ -184,7 +179,6 @@ const ClientNavigation = ({ session }: { session: Session | null }) => {
 										</Link>
 									</li>
 								)}
-
 								<li>
 									{session ? (
 										<LogoutButton className={mobileItemClass('#logout')} />

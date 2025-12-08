@@ -42,7 +42,7 @@ const UserWatchlists = ({
 	const router = useRouter();
 
 	return (
-		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+		<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 			{sortedWatchlists.map(watchlist => {
 				const isFavourite = watchlist.favourite === 1;
 
@@ -51,7 +51,8 @@ const UserWatchlists = ({
 						key={watchlist.id}
 						className="relative flex flex-col justify-between rounded-xl border border-gray-700 bg-gray-900 p-4 shadow-md transition hover:border-blue-600 hover:shadow-lg"
 					>
-						<div className="absolute top-2 right-2 cursor-pointer text-xl text-yellow-400">
+						{/* Favourite star */}
+						<div className="absolute top-2 right-2 text-xl text-yellow-400 sm:top-3 sm:right-3">
 							{isFavourite ? (
 								<AiFillStar
 									onClick={() => {
@@ -77,20 +78,22 @@ const UserWatchlists = ({
 							)}
 						</div>
 
+						{/* Card content */}
 						<div className="flex flex-col gap-2">
 							<Link
 								href={`/watchlists/${watchlist.id}`}
-								className="text-lg font-bold text-white hover:underline"
+								className="truncate text-lg font-bold text-white hover:underline"
 							>
 								{watchlist.name}
 							</Link>
-							<p className="text-sm text-gray-400">
+							<p className="line-clamp-3 text-sm text-gray-400">
 								{watchlist.description ?? 'No description'}
 							</p>
 							<p className="text-sm text-gray-400">{watchlist.movies} movies</p>
 						</div>
 
-						<div className="mt-4 flex gap-2">
+						{/* Buttons */}
+						<div className="mt-4 flex flex-col gap-2 sm:flex-row sm:gap-2">
 							<button
 								onClick={() => router.push(`/watchlists/edit/${watchlist.id}`)}
 								className="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
