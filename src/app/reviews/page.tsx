@@ -33,10 +33,16 @@ const ReviewsPage = async ({ searchParams }: ReviewsPageProps) => {
 
 	if (!session?.user?.email) {
 		return (
-			<main className="relative min-h-screen bg-transparent text-white">
-				<div className="mx-auto max-w-5xl px-6 py-10">
-					<div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-						<p className="text-sm text-white/80">Please log in.</p>
+			<main className="items-top flex justify-center text-white">
+				<div className="w-full max-w-md px-6 py-10">
+					<div className="rounded-2xl bg-white/5 p-8 shadow-lg backdrop-blur-md">
+						<p className="mb-6 text-sm text-white/80">Please log in.</p>
+						<Link
+							href="/login"
+							className="block w-full rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+						>
+							Sign In
+						</Link>
 					</div>
 				</div>
 			</main>
