@@ -5,14 +5,21 @@ import { useRouter } from 'next/navigation';
 
 import Badge from '@/components/ui/Badge';
 import Card from '@/components/ui/Card';
-import Select from '@/components/ui/Select';
 
-import { createReviewAction } from '../actions';
+import { updateReviewAction } from '../../actions';
 
-type MovieOption = { id: number; title: string; year: number | null };
+type Review = {
+	id: number;
+	rating: number;
+	text: string;
+	createdAt: number;
+	movieId: number;
+	movieTitle: string | null;
+	movieYear: number | null;
+};
 
 type Props = {
-	movies: MovieOption[];
+	review: Review;
 };
 
 const toneFromRating = (v: number) => {
@@ -22,32 +29,28 @@ const toneFromRating = (v: number) => {
 	return 'danger';
 };
 
-const CreateReviewPageClient = ({ movies }: Props) => {
+const EditReviewPageClient = ({ review }: Props) => {
 	const router = useRouter();
 
-	const [rating, setRating] = useState(50);
-	const [movieId, setMovieId] = useState('');
-	const [text, setText] = useState('');
+	const [rating, setRating] = useState<number>(Math.round(review.rating));
+	const [text, setText] = useState<string>(review.text ?? '');
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [showToast, setShowToast] = useState(false);
 
-	const selectedMovieLabel = useMemo(() => {
-		const id = Number(movieId);
-		if (!Number.isFinite(id)) return null;
-		const m = movies.find(x => x.id === id);
-		if (!m) return null;
-		return `${m.title}${m.year ? ` (${m.year})` : ''}`;
-	}, [movieId, movies]);
+	const movieLabel = useMemo(
+		() =>
+			`${review.movieTitle ?? `Movie #${review.movieId}`}${
+				review.movieYear ? ` (${review.movieYear})` : ''
+			}`,
+		[review.movieId, review.movieTitle, review.movieYear]
+	);
 
 	const handleAction = async (formData: FormData) => {
 		try {
 			setIsSubmitting(true);
 
-			await createReviewAction(formData);
-			setRating(50);
-			setMovieId('');
-			setText('');
+			await updateReviewAction(formData);
 
 			setShowToast(true);
 
@@ -75,7 +78,7 @@ const CreateReviewPageClient = ({ movies }: Props) => {
 							<div className="mt-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400/90" />
 							<div>
 								<p className="text-sm font-semibold text-white">
-									Review created
+									Review updated
 								</p>
 								<p className="mt-0.5 text-xs text-white/60">
 									Redirecting to{' '}
@@ -92,41 +95,20 @@ const CreateReviewPageClient = ({ movies }: Props) => {
 			<div className="mx-auto max-w-2xl px-6 py-10">
 				<header className="mb-6">
 					<div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
-						<span className="h-2 w-2 rounded-full bg-amber-300/80" />
-						New review
+						<span className="h-2 w-2 rounded-full bg-sky-400/80" />
+						Edit review
 					</div>
 
 					<h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-						Create Review
+						Edit Review
 					</h1>
 
-					<p className="mt-2 text-sm text-white/60">
-						Pick a movie, set your rating, and add a short note.
-					</p>
+					<p className="mt-2 text-sm text-white/60">{movieLabel}</p>
 				</header>
 
 				<Card>
 					<form action={handleAction} className="flex flex-col gap-5">
-						<Select
-							name="movieId"
-							label="Movie"
-							value={movieId}
-							onChange={setMovieId}
-							hint={
-								selectedMovieLabel
-									? `Selected: ${selectedMovieLabel}`
-									: undefined
-							}
-						>
-							<option value="">Select movie</option>
-							{movies.map(m => (
-								<option key={m.id} value={String(m.id)}>
-									{m.title}
-									{m.year ? ` (${m.year})` : ''}
-								</option>
-							))}
-						</Select>
-
+						<input type="hidden" name="reviewId" value={String(review.id)} />
 						<input type="hidden" name="rating" value={String(rating)} />
 
 						<div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
@@ -196,7 +178,7 @@ const CreateReviewPageClient = ({ movies }: Props) => {
 							disabled={isSubmitting}
 							className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:border-white/15 hover:bg-white/15 focus:ring-2 focus:ring-white/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
 						>
-							{isSubmitting ? 'Submitting…' : 'Submit Review'}
+							{isSubmitting ? 'Submitting…' : 'Save changes'}
 						</button>
 					</form>
 				</Card>
@@ -205,4 +187,4 @@ const CreateReviewPageClient = ({ movies }: Props) => {
 	);
 };
 
-export default CreateReviewPageClient;
+export default EditReviewPageClient;
