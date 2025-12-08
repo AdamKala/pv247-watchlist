@@ -131,7 +131,7 @@ const ProfileInfo = ({ user, updateProfile }: ProfileInfoProps) => {
 						</>
 					) : (
 						<button
-							className="rounded-lg bg-blue-600 px-4 py-2 font-semibold hover:bg-blue-700"
+							className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold hover:bg-blue-700"
 							onClick={() => setIsEditing(true)}
 						>
 							Edit Profile

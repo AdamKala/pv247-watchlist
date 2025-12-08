@@ -155,3 +155,70 @@ export const getLatestReviews = async (userEmail: string, limit = 2) => {
 		.orderBy(desc(createdAtSeconds), desc(reviews.id))
 		.limit(limit);
 };
+
+export const getUserReviewById = async (
+	userEmail: string,
+	reviewId: number
+) => {
+	const user = await db
+		.select()
+		.from(users)
+		.where(eq(users.email, userEmail))
+		.get();
+
+	if (!user) return null;
+
+	return db
+		.select({
+			id: reviews.id,
+			rating: reviews.rating,
+			text: reviews.text,
+			createdAt: reviews.createdAt,
+			movieId: reviews.movieId,
+			movieTitle: movies.title,
+			movieYear: movies.year
+		})
+		.from(reviews)
+		.leftJoin(movies, eq(reviews.movieId, movies.id))
+		.where(and(eq(reviews.id, reviewId), eq(reviews.userId, user.id)))
+		.get();
+};
+
+export const updateReviewForUser = async (
+	userEmail: string,
+	reviewId: number,
+	rating: number,
+	text: string
+) => {
+	const user = await db
+		.select()
+		.from(users)
+		.where(eq(users.email, userEmail))
+		.get();
+
+	if (!user) throw new Error('User not found.');
+
+	const existing = await db
+		.select({ movieId: reviews.movieId })
+		.from(reviews)
+		.where(and(eq(reviews.id, reviewId), eq(reviews.userId, user.id)))
+		.get();
+
+	if (!existing) throw new Error('Review not found.');
+
+	await db
+		.update(reviews)
+		.set({ rating, text })
+		.where(and(eq(reviews.id, reviewId), eq(reviews.userId, user.id)));
+
+	const avgRow = await db
+		.select({ avg: sql<number>`avg(${reviews.rating})`.as('avg') })
+		.from(reviews)
+		.where(eq(reviews.movieId, existing.movieId))
+		.get();
+
+	await db
+		.update(movies)
+		.set({ localRating: avgRow?.avg ?? null })
+		.where(eq(movies.id, existing.movieId));
+};
