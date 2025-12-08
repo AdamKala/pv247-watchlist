@@ -34,18 +34,18 @@ const UserWatchlistsPage = ({
 	);
 
 	return (
-		<main className="container mx-auto px-6 py-10 text-white">
-			<div className="mb-8 flex items-center justify-between">
-				<h1 className="text-3xl font-bold">Your Watchlists</h1>
+		<main className="container mx-auto px-4 py-8 text-white sm:px-6">
+			<div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+				<h1 className="text-2xl font-bold sm:text-3xl">Your Watchlists</h1>
 				<button
 					onClick={() => router.push('/watchlists/create')}
-					className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
+					className="w-full cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 sm:w-auto"
 				>
 					Create Watchlist
 				</button>
 			</div>
 
-			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				{sortedWatchlists.map(watchlist => {
 					if (watchlist.id === -1) {
 						return (
@@ -65,7 +65,8 @@ const UserWatchlistsPage = ({
 							key={watchlist.id}
 							className="relative flex flex-col justify-between rounded-xl border border-gray-700 bg-gray-900 p-4 shadow-md transition hover:border-blue-600 hover:shadow-lg"
 						>
-							<div className="absolute top-2 right-2 cursor-pointer text-xl text-yellow-400">
+							{/* Favourite star */}
+							<div className="absolute top-2 right-2 text-xl text-yellow-400 sm:top-3 sm:right-3">
 								{isFavourite ? (
 									<AiFillStar
 										onClick={() => {
@@ -91,18 +92,20 @@ const UserWatchlistsPage = ({
 								)}
 							</div>
 
+							{/* Card content */}
 							<div className="flex flex-col gap-2">
 								<Link
 									href={`/watchlists/${watchlist.id}`}
-									className="text-lg font-bold text-white hover:underline"
+									className="truncate text-lg font-bold text-white hover:underline"
 								>
 									{watchlist.name}
 								</Link>
-								<p className="text-sm text-gray-400">
+								<p className="line-clamp-2 text-sm text-gray-400">
 									{watchlist.description ?? 'No description'}
 								</p>
 
-								<div className="mt-2 flex h-[5*36px] flex-col gap-1 overflow-y-auto">
+								{/* Movies list */}
+								<div className="mt-2 flex max-h-36 flex-col gap-1 overflow-y-auto">
 									{watchlist.movies?.slice(0, 5).map(movie => (
 										<div
 											key={movie.id}
@@ -111,18 +114,17 @@ const UserWatchlistsPage = ({
 											<Image
 												src={movie.image ?? '/icons/default-movie.svg'}
 												alt={movie.title}
-												width={24} // equals h-6
-												height={24} // equals w-6
+												width={24}
+												height={24}
 												className="h-6 w-6 shrink-0 rounded object-cover"
 											/>
-
 											<span className="truncate text-sm font-semibold text-white">
 												{movie.title}
 											</span>
 										</div>
 									))}
 									{watchlist.movies && watchlist.movies.length > 5 && (
-										<span className="mt-1 text-xs text-gray-400">
+										<span className="mt-1 truncate text-xs text-gray-400">
 											+{watchlist.movies.length - 5} more
 										</span>
 									)}
@@ -135,12 +137,13 @@ const UserWatchlistsPage = ({
 								</p>
 							</div>
 
-							<div className="mt-4 flex gap-2">
+							{/* Action buttons */}
+							<div className="mt-4 flex flex-col gap-2 sm:flex-row">
 								<button
 									onClick={() =>
 										router.push(`/watchlists/edit/${watchlist.id}`)
 									}
-									className="flex-1 cursor-pointer rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+									className="w-full cursor-pointer rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 sm:flex-1"
 								>
 									Edit
 								</button>
@@ -159,7 +162,7 @@ const UserWatchlistsPage = ({
 											);
 											void deleteWatchlist(watchlist.id);
 										}}
-										className="flex-1 cursor-pointer rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+										className="w-full cursor-pointer rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700 sm:flex-1"
 									>
 										{deleteConfirmation === watchlist.id
 											? 'Are you sure?'

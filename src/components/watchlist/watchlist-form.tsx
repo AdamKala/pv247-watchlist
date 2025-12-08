@@ -64,8 +64,8 @@ const WatchlistForm = ({ initialData, onSubmit }: WatchlistFormProps) => {
 	};
 
 	return (
-		<div className="flex w-full flex-col gap-6 overflow-visible rounded-xl bg-black p-6 text-white shadow-lg">
-			<h1 className="text-3xl font-bold text-white">
+		<div className="flex w-full flex-col gap-6 overflow-visible rounded-xl bg-black p-4 text-white shadow-lg sm:p-6">
+			<h1 className="text-2xl font-bold text-white sm:text-3xl">
 				{initialData ? 'Edit Watchlist' : 'Create New Watchlist'}
 			</h1>
 
@@ -73,44 +73,51 @@ const WatchlistForm = ({ initialData, onSubmit }: WatchlistFormProps) => {
 				onSubmit={form.handleSubmit(submitForm)}
 				className="flex flex-col gap-4 overflow-visible"
 			>
-				<div className="flex flex-col gap-2">
-					<label htmlFor="name" className="font-semibold text-white">
-						Watchlist Name
-					</label>
-					<input
-						id="name"
-						type="text"
-						{...form.register('name')}
-						placeholder="Enter watchlist name"
-						className="w-full rounded-lg bg-gray-900 px-3 py-2 text-white ring-1 ring-gray-700 outline-none focus:ring-2 focus:ring-blue-600"
-					/>
-					{form.formState.errors.name && (
-						<p className="text-sm text-red-500">
-							{form.formState.errors.name.message}
-						</p>
-					)}
+				<div className="flex flex-col sm:flex-row sm:gap-4">
+					<div className="flex flex-1 flex-col gap-2">
+						<label htmlFor="name" className="font-semibold text-white">
+							Watchlist Name
+						</label>
+						<input
+							id="name"
+							type="text"
+							{...form.register('name')}
+							placeholder="Enter watchlist name"
+							className="w-full rounded-lg bg-gray-900 px-3 py-2 text-white ring-1 ring-gray-700 outline-none focus:ring-2 focus:ring-blue-600"
+						/>
+						{form.formState.errors.name && (
+							<p className="text-sm text-red-500">
+								{form.formState.errors.name.message}
+							</p>
+						)}
+					</div>
+
+					<div className="mt-4 flex flex-1 flex-col gap-2 sm:mt-0">
+						<label htmlFor="description" className="font-semibold text-white">
+							Description
+						</label>
+						<textarea
+							id="description"
+							{...form.register('description')}
+							rows={3}
+							placeholder="Optional description..."
+							className="w-full resize-none rounded-lg bg-gray-900 px-3 py-2 text-white ring-1 ring-gray-700 outline-none focus:ring-2 focus:ring-blue-600"
+						/>
+					</div>
 				</div>
 
-				<div className="flex flex-col gap-2">
-					<label htmlFor="description" className="font-semibold text-white">
-						Description
-					</label>
-					<textarea
-						id="description"
-						{...form.register('description')}
-						rows={3}
-						placeholder="Optional description..."
-						className="w-full resize-none rounded-lg bg-gray-900 px-3 py-2 text-white ring-1 ring-gray-700 outline-none focus:ring-2 focus:ring-blue-600"
+				<div className="flex flex-col gap-4 sm:gap-6">
+					<MovieSearchInput onSelectMovie={handleAddMovie} />
+					<SelectedMoviesList
+						movies={movies}
+						onDeleteMovie={handleDeleteMovie}
 					/>
 				</div>
 
-				<MovieSearchInput onSelectMovie={handleAddMovie} />
-				<SelectedMoviesList movies={movies} onDeleteMovie={handleDeleteMovie} />
-
-				<div className="mt-4 flex gap-4">
+				<div className="mt-4 flex flex-col gap-2 sm:flex-row sm:gap-4">
 					<button
 						type="submit"
-						className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold transition hover:bg-blue-700"
+						className="w-full cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold transition hover:bg-blue-700 sm:w-auto"
 					>
 						{isSubmitting
 							? 'Saving...'
@@ -121,7 +128,7 @@ const WatchlistForm = ({ initialData, onSubmit }: WatchlistFormProps) => {
 					<button
 						type="button"
 						onClick={() => router.back()}
-						className="cursor-pointer rounded-lg bg-gray-700 px-4 py-2 font-semibold transition hover:bg-gray-600"
+						className="w-full cursor-pointer rounded-lg bg-gray-700 px-4 py-2 font-semibold transition hover:bg-gray-600 sm:w-auto"
 					>
 						Cancel
 					</button>
