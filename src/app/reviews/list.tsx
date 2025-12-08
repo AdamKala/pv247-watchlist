@@ -1,10 +1,14 @@
+import Link from 'next/link';
+
 import Badge from '@/components/ui/Badge';
+
+import { deleteReviewAction } from './actions';
 
 type Review = {
 	id: number;
 	rating: number;
 	text: string;
-	createdAt: number; // unix seconds
+	createdAt: number;
 	movieId: number;
 	movieTitle: string | null;
 	movieYear: number | null;
@@ -48,12 +52,31 @@ const List = ({ reviews }: ListProps) => (
 							<p className="mt-1 text-xs text-white/60">{date}</p>
 						</div>
 
-						<Badge
-							tone={getTone(review.rating)}
-							title={`Rating: ${review.rating}/100`}
-						>
-							{Math.round(review.rating)}/100
-						</Badge>
+						<div className="flex items-center gap-2">
+							<Link
+								href={`/reviews/${review.id}/edit`}
+								className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:border-white/15 hover:bg-white/15 focus:ring-2 focus:ring-white/20 focus:outline-none"
+							>
+								Edit
+							</Link>
+
+							<form action={deleteReviewAction}>
+								<input type="hidden" name="reviewId" value={review.id} />
+								<button
+									type="submit"
+									className="inline-flex items-center justify-center rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-100 shadow-sm transition hover:border-red-500/40 hover:bg-red-500/15 focus:ring-2 focus:ring-red-500/30 focus:outline-none"
+								>
+									Delete
+								</button>
+							</form>
+
+							<Badge
+								tone={getTone(review.rating)}
+								title={`Rating: ${review.rating}/100`}
+							>
+								{Math.round(review.rating)}/100
+							</Badge>
+						</div>
 					</div>
 
 					{review.text ? (

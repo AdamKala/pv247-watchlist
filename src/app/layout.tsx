@@ -13,6 +13,11 @@ export const metadata: Metadata = {
 	title: 'Watchlist'
 };
 
+export const viewport = {
+	width: 'device-width',
+	initialScale: 1
+};
+
 const RootLayout = ({
 	children
 }: Readonly<{

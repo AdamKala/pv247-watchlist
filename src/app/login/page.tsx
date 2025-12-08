@@ -36,7 +36,7 @@ const LoginPage = () => {
 						setSignGoogle(true);
 						signIn('google', { callbackUrl: '/account' });
 					}}
-					className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
+					className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
 				>
 					<Image
 						src="/icons/google.svg"
@@ -52,7 +52,7 @@ const LoginPage = () => {
 						setSignGit(true);
 						signIn('github', { callbackUrl: '/account' });
 					}}
-					className="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
+					className="mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
 				>
 					<Image
 						src="/icons/github.svg"

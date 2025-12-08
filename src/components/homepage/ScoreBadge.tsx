@@ -20,7 +20,7 @@ const ScoreBadge = ({ value }: ScoreBadgeProps) => {
 			title={`Score: ${v}`}
 		>
 			<span className="h-1.5 w-1.5 rounded-full bg-current opacity-80" />
-			{v}
+			{v}/100
 		</span>
 	);
 };
