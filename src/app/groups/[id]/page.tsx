@@ -14,7 +14,8 @@ import {
 	joinPublicGroup,
 	kickGroupMember,
 	requestJoinPrivateGroup,
-	resolveJoinRequest
+	resolveJoinRequest,
+	leaveGroup
 } from '@/db/groups';
 
 type Props = {
@@ -30,6 +31,17 @@ const joinPublicAction = async (groupId: number) => {
 	await joinPublicGroup(session.user.email, groupId);
 	revalidatePath(`/groups/${groupId}`);
 	revalidatePath('/groups');
+};
+
+const leaveGroupAction = async (groupId: number) => {
+	'use server';
+	const session = await getServerSession(authOptions);
+	if (!session?.user?.email) return;
+
+	await leaveGroup(session.user.email, groupId);
+
+	revalidatePath('/groups');
+	redirect('/groups');
 };
 
 const requestJoinAction = async (groupId: number) => {
@@ -236,6 +248,13 @@ const GroupDetailPage = async ({ params, searchParams }: Props) => {
 						<span className="rounded-full bg-gray-800 px-3 py-1 text-sm">
 							{group.visibility}
 						</span>
+						{me.isMember && (
+							<form action={leaveGroupAction.bind(null, groupId)}>
+								<button className="cursor-pointer rounded-lg bg-gray-700 px-4 py-2 text-sm font-semibold hover:bg-gray-600">
+									Leave group
+								</button>
+							</form>
+						)}
 
 						{me.isOwner && (
 							<>
@@ -482,14 +501,16 @@ const GroupDetailPage = async ({ params, searchParams }: Props) => {
 											) : null}
 										</div>
 
-										<form
-											action={deleteFavoriteAction.bind(null, groupId, f.id)}
-											className="w-full sm:w-auto"
-										>
-											<button className="w-full rounded-md bg-red-600 px-3 py-2 text-sm font-semibold hover:bg-red-700 sm:w-auto">
-												Delete
-											</button>
-										</form>
+										{f.userId === me.userId && (
+											<form
+												action={deleteFavoriteAction.bind(null, groupId, f.id)}
+												className="w-full sm:w-auto"
+											>
+												<button className="w-full rounded-md bg-red-600 px-3 py-2 text-sm font-semibold hover:bg-red-700 sm:w-auto">
+													Delete
+												</button>
+											</form>
+										)}
 									</div>
 
 									<div className="mt-4 space-y-3">

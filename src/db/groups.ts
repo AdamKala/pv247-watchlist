@@ -546,20 +546,88 @@ export const deleteFavoriteFromGroup = async (
 		.get();
 	if (!fav) return;
 
-	const group = await db
-		.select()
-		.from(groups)
-		.where(eq(groups.id, fav.groupId))
-		.get();
-	if (!group) return;
-
-	const canDelete = fav.userId === userId || group.ownerId === userId;
-	if (!canDelete) throw new Error('Forbidden');
+	if (fav.userId !== userId) throw new Error('Forbidden');
 
 	await db
 		.delete(groupFavoriteComments)
 		.where(eq(groupFavoriteComments.favoriteId, favoriteId));
+
 	await db.delete(groupFavorites).where(eq(groupFavorites.id, favoriteId));
+};
+
+export type LeaveGroupResult = 'left' | 'deleted';
+
+export const leaveGroup = async (
+	userEmail: string,
+	groupId: number
+): Promise<LeaveGroupResult> => {
+	const userId = await getUserIdByEmail(userEmail);
+	if (!userId) throw new Error('Not authorized');
+
+	const group = await db
+		.select()
+		.from(groups)
+		.where(eq(groups.id, groupId))
+		.get();
+	if (!group) throw new Error('Group not found');
+
+	const member = await db
+		.select({ role: groupMembers.role })
+		.from(groupMembers)
+		.where(
+			and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, userId))
+		)
+		.get();
+
+	if (!member) throw new Error('Not a member');
+
+	if (group.ownerId === userId || member.role === 'owner') {
+		await deleteGroupCascade(userEmail, groupId);
+		return 'deleted';
+	}
+
+	const favIds = await db
+		.select({ id: groupFavorites.id })
+		.from(groupFavorites)
+		.where(
+			and(
+				eq(groupFavorites.groupId, groupId),
+				eq(groupFavorites.userId, userId)
+			)
+		);
+
+	const ids = favIds.map(x => x.id);
+	if (ids.length > 0) {
+		await db
+			.delete(groupFavoriteComments)
+			.where(inArray(groupFavoriteComments.favoriteId, ids));
+
+		await db
+			.delete(groupFavorites)
+			.where(
+				and(
+					eq(groupFavorites.groupId, groupId),
+					eq(groupFavorites.userId, userId)
+				)
+			);
+	}
+
+	await db
+		.delete(groupMembers)
+		.where(
+			and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, userId))
+		);
+
+	await db
+		.delete(groupJoinRequests)
+		.where(
+			and(
+				eq(groupJoinRequests.groupId, groupId),
+				eq(groupJoinRequests.userId, userId)
+			)
+		);
+
+	return 'left';
 };
 
 export const addCommentToFavorite = async (
