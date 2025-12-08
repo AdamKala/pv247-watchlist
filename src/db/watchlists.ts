@@ -1,10 +1,11 @@
 import { eq, and } from 'drizzle-orm';
 import { csfd } from 'node-csfd-api';
 
-import type { MovieSearchItemProps, NewMovie } from '@/lib/movies';
+import type { Movie, MovieSearchItemProps, NewMovie } from '@/lib/movies';
+import { pullAndStoreFromCSFDId } from '@/actions/movies/pull-from-csfd';
 
 import { watchlistItems, watchlists, users, movies } from './schema';
-import { addMovieToLocalDB } from './movies';
+import { addMovieToLocalDB, getMovieByCSFDId, getMovieByTitle } from './movies';
 
 import { db } from './index';
 
@@ -192,36 +193,11 @@ export const addMovieToWatchlist = async (
 	watchlistId: number,
 	movieData: MovieSearchItemProps
 ) => {
-	const existingEntry = await db
-		.select()
-		.from(movies)
-		.where(eq(movies.title, movieData.title))
-		.get();
+	let movie: Movie | undefined = await getMovieByTitle(movieData.title);
 
-	if (!existingEntry) {
-		const result = await csfd.movie(movieData.id);
+	movie ??= await pullAndStoreFromCSFDId(movieData.id, movieData.type);
 
-		const toUpload: NewMovie = {
-			title: movieData.title,
-			image: movieData.posterUrl,
-			year: parseInt(movieData.year, 10),
-			origins: movieData.origins ? movieData.origins[0] : '',
-			csfdId: movieData.id,
-			csfdLastFetched: new Date().toISOString(),
-			csfdRating: result.rating,
-			type: movieData.type
-		};
-
-		await addMovieToLocalDB(toUpload);
-	}
-
-	const movieEntry = await db
-		.select()
-		.from(movies)
-		.where(eq(movies.title, movieData.title))
-		.get();
-
-	if (!movieEntry) throw new Error('Movie was not added to local DB');
+	if (!movie) throw new Error('Movie was not added to local DB');
 
 	const alreadyInWatchlist = await db
 		.select()
@@ -229,7 +205,7 @@ export const addMovieToWatchlist = async (
 		.where(
 			and(
 				eq(watchlistItems.watchlistId, watchlistId),
-				eq(watchlistItems.movieId, movieEntry.id)
+				eq(watchlistItems.movieId, movie.id)
 			)
 		)
 		.get();
@@ -238,7 +214,7 @@ export const addMovieToWatchlist = async (
 
 	await db.insert(watchlistItems).values({
 		watchlistId,
-		movieId: movieEntry.id
+		movieId: movie.id
 	});
 };
 
