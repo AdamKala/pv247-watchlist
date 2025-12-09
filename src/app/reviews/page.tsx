@@ -65,8 +65,21 @@ const ReviewsPage = async ({ searchParams }: ReviewsPageProps) => {
 		sortOrder
 	});
 
-	const movieList = [...new Set(reviews.map(r => r.movieId))].sort(
-		(a, b) => a - b
+	const uniqueMoviesMap = new Map();
+	reviews.forEach(review => {
+		const movieId = review.movieId;
+
+		if (!uniqueMoviesMap.has(movieId)) {
+			uniqueMoviesMap.set(movieId, {
+				id: movieId,
+				title: review.movieTitle,
+				year: review.movieYear
+			});
+		}
+	});
+
+	const movieList = Array.from(uniqueMoviesMap.values()).sort(
+		(a, b) => a.id - b.id
 	);
 
 	return (

@@ -2,13 +2,15 @@
 
 import Select from '@/components/ui/Select';
 
+type MovieOption = { id: number; title: string; year: number | null };
+
 type FiltersProps = {
 	searchParams: {
 		movieId?: string;
 		sortBy?: string;
 		sortOrder?: string;
 	};
-	movieList: number[];
+	movieList: MovieOption[];
 };
 
 const Filters = ({ searchParams, movieList }: FiltersProps) => {
@@ -40,10 +42,14 @@ const Filters = ({ searchParams, movieList }: FiltersProps) => {
 				value={searchParams.movieId ?? ''}
 				onChange={v => updateParam('movieId', v || undefined)}
 			>
-				<option value="">All movies</option>
+				<option key="all-movies-default" value="">
+					All movies
+				</option>
+
 				{movieList.map(m => (
-					<option key={m} value={String(m)}>
-						Movie #{m}
+					<option key={m.id} value={String(m.id)}>
+						{m.title}
+						{m.year ? ` (${m.year})` : ''}
 					</option>
 				))}
 			</Select>
