@@ -130,7 +130,8 @@ export const editWatchlist = async (
 	userEmail: string,
 	name: string,
 	description: string | null,
-	movies: MovieSearchItemProps[]
+	movies: MovieSearchItemProps[],
+	watchlistId: number
 ) => {
 	const user = await db
 		.select()
@@ -145,7 +146,7 @@ export const editWatchlist = async (
 	const watchlist = await db
 		.select()
 		.from(watchlists)
-		.where(and(eq(watchlists.userId, userId), eq(watchlists.name, name)))
+		.where(and(eq(watchlists.userId, userId), eq(watchlists.id, watchlistId)))
 		.get();
 
 	if (!watchlist) throw new Error('Watchlist not found');
@@ -153,6 +154,11 @@ export const editWatchlist = async (
 	await db
 		.update(watchlists)
 		.set({ description })
+		.where(eq(watchlists.id, watchlist.id));
+
+	await db
+		.update(watchlists)
+		.set({ name })
 		.where(eq(watchlists.id, watchlist.id));
 
 	const existingItems = await db
