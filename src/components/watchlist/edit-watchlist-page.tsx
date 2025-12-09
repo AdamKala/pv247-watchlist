@@ -35,7 +35,8 @@ const EditWatchlistPage = (props: Props) => {
 					props.userEmail,
 					data.name,
 					data.description ?? '',
-					movies
+					movies,
+					props.watchlist.id
 				);
 				router.push('/watchlists');
 			}}

@@ -9,8 +9,9 @@ export const editWatchlistAction = async (
 	userEmail: string,
 	name: string,
 	description: string | null,
-	movies: MovieSearchItemProps[]
+	movies: MovieSearchItemProps[],
+	watchlistId: number
 ) => {
-	await editWatchlist(userEmail, name, description, movies);
-	revalidatePath('/profile');
+	await editWatchlist(userEmail, name, description, movies, watchlistId);
+	revalidatePath('/watchlists');
 };
