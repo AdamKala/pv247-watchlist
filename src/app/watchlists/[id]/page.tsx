@@ -109,7 +109,7 @@ const WatchlistDetailPage = async ({
 										<span className="text-sm text-gray-300">Local Rating:</span>
 										<span className="ml-auto text-sm whitespace-nowrap text-gray-300">
 											{movie.localRating !== null
-												? `${movie.localRating}/10`
+												? `${movie.localRating}/100`
 												: 'N/A'}
 										</span>
 									</div>
@@ -118,7 +118,7 @@ const WatchlistDetailPage = async ({
 										<span className="text-sm text-gray-400">CSFD Rating:</span>
 										<span className="ml-auto text-sm whitespace-nowrap text-gray-400">
 											{movie.csfdRating !== null
-												? `${movie.csfdRating}/10`
+												? `${movie.csfdRating}/100`
 												: 'N/A'}
 										</span>
 									</div>
