@@ -17,7 +17,7 @@ const CreateWatchlistPage = ({ userEmail }: { userEmail: string }) => {
 					data.description ?? '',
 					movies
 				);
-				router.push('/account');
+				router.push('/watchlists');
 			}}
 		/>
 	);

@@ -12,19 +12,19 @@ const UserListsPage = async () => {
 
 	if (!session?.user?.email) {
 		return (
-			<div className="flex h-screen flex-col items-center justify-center gap-4 bg-gray-900 text-white">
-				<p className="text-2xl font-bold text-red-500">Access Denied</p>
-				<p className="text-center text-gray-300">
-					You need to log in to view your watchlists. Please sign in to
-					continue.
-				</p>
-				<Link
-					href="/login"
-					className="mt-4 rounded-lg bg-blue-600 px-6 py-2 font-semibold text-white transition hover:bg-blue-700"
-				>
-					Sign In
-				</Link>
-			</div>
+			<main className="items-top flex justify-center text-white">
+				<div className="w-full max-w-md px-6 py-10">
+					<div className="rounded-2xl bg-white/5 p-8 shadow-lg backdrop-blur-md">
+						<p className="mb-6 text-sm text-white/80">Please log in.</p>
+						<Link
+							href="/login"
+							className="block w-full rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+						>
+							Sign In
+						</Link>
+					</div>
+				</div>
+			</main>
 		);
 	}
 
